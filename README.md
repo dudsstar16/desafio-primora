@@ -77,7 +77,7 @@ desafio-primora/
 - [x] Criar a estrutura completa de pastas do projeto
 - [x] Adicionar os três PDFs de especificação em `docs/requisitos/`
 - [x] Adicionar a base original `02-clientes_distribuidora_vetor.csv` em `data/raw/`
-- [ ] Convidar os integrantes do grupo para o repositório no GitHub
+- [x] Convidar os integrantes do grupo para o repositório no GitHub
 
 ### Etapas Futuras (Próximos Passos)
 - [ ] **Etapa 2:** Modelagem do banco (MER/DER) e planejamento da tabela de auditoria.
@@ -103,19 +103,36 @@ cd desafio-primora
 ```
 
 ### 3. Criar e Ativar o Ambiente Virtual
-No Windows (PowerShell):
+
+> #### 💡 Para que serve o Ambiente Virtual (`venv`) e por que ativá-lo?
+> - **O que é:** Uma caixa isolada só para este projeto.
+> - **Por que criar:** Evita misturar os pacotes deste projeto com outros programas do seu computador. Garante que todos no grupo usem exatamente as mesmas versões.
+> - **Por que ATIVAR:** O comando de ativação avisa ao seu terminal: *"A partir de agora, use o Python e o pip desta pasta, e não os globais do Windows"*.
+> - **Como saber se deu certo:** Um `(venv)` vai aparecer no comecinho da linha do seu terminal.
+
+**No Windows (PowerShell):**
 ```powershell
+# Cria a caixinha isolada chamada venv
 python -m venv venv
+
+# Ativa o ambiente (liga a chavinha no terminal)
 .\venv\Scripts\Activate.ps1
 ```
 
-No Linux/Mac:
+> **Dica Windows:** Se der erro de script bloqueado, execute antes:  
+> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+
+**No Linux/Mac:**
 ```bash
+# Cria a caixinha isolada chamada venv
 python3 -m venv venv
+
+# Ativa o ambiente
 source venv/bin/activate
 ```
 
 ### 4. Instalar as Dependências
+Com o ambiente ativado `(venv)`, instale as bibliotecas necessárias:
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
