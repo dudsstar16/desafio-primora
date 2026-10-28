@@ -144,6 +144,36 @@ pip install -r requirements.txt
 
 ---
 
+## 👥 Integrantes do Grupo
+
+<table align="center">
+  <tr>
+    <td align="center" width="33.33%">
+      <a href="https://github.com/Hefestos27">
+        <img src="https://github.com/Hefestos27.png" width="110" height="110" alt="Avatar de Hefestos27"><br>
+        <strong>Hefestos27</strong>
+      </a><br>
+      <sub>Scrum Master</sub>
+    </td>
+    <td align="center" width="33.33%">
+      <a href="https://github.com/alderiana">
+        <img src="https://github.com/alderiana.png" width="110" height="110" alt="Avatar de alderiana"><br>
+        <strong>alderiana</strong>
+      </a><br>
+      <sub>Desenvolvedora</sub>
+    </td>
+    <td align="center" width="33.33%">
+      <a href="https://github.com/dudsstar16">
+        <img src="https://github.com/dudsstar16.png" width="110" height="110" alt="Avatar de Eduarda Reis"><br>
+        <strong>Eduarda Reis</strong>
+      </a><br>
+      <sub>Desenvolvedora</sub>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## 👥 Guia para a Equipe
 
 1. **Guia Rápido dos Integrantes:**
