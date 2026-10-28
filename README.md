@@ -3,6 +3,9 @@
 Projeto integrado de Engenharia e Backend desenvolvido como parte do Desafio Primora.  
 O objetivo é tratar dados cadastrais inconsistentes de clientes (ETL em Python), armazená-los em banco relacional (PostgreSQL) e disponibilizá-los através de uma API REST (Django REST Framework).
 
+> 👉 **Primeira vez no repositório?**  
+> Leia nosso guia super simples e direto para o grupo: **[COMECE_POR_AQUI.md](COMECE_POR_AQUI.md)**.
+
 ---
 
 ## 🎯 Objetivo do Projeto
@@ -47,6 +50,7 @@ desafio-primora/
 ├── scripts/                # Scripts auxiliares e migrações SQL
 │
 ├── .gitignore              # Arquivos e pastas ignorados pelo controle de versão Git
+├── COMECE_POR_AQUI.md      # Guia rápido e simples para todos os integrantes
 ├── README.md               # Documentação inicial e guia do projeto
 └── requirements.txt        # Dependências e bibliotecas do projeto
 ```
@@ -142,10 +146,12 @@ pip install -r requirements.txt
 
 ## 👥 Guia para a Equipe
 
-1. **Memória Local do Projeto:**
-   - Existe uma pasta local de apoio chamada `memoria/` (ignorada no Git) para guiar os estudos e o passo a passo com explicações simples para quem está começando.
-2. **Branches de Trabalho:**
+1. **Guia Rápido dos Integrantes:**
+   - Leia o arquivo [`COMECE_POR_AQUI.md`](COMECE_POR_AQUI.md) para entender os objetivos, o porquê do ambiente virtual e as regras do projeto.
+2. **O que é a Memória Local:**
+   - Existe uma pasta de apoio local chamada `memoria/` (ignorada no Git para não poluir a entrega) que funciona como caderno de estudos. O líder pode disponibilizá-la aos membros no WhatsApp/Drive.
+3. **Branches de Trabalho:**
    - Nunca trabalhe diretamente na branch `main`.
    - Crie uma branch para cada funcionalidade (ex: `feature/etl-limpeza`, `feature/api-clientes`).
-3. **Dúvidas Técnicas:**
-   - Consulte o glossário e guias na memória local do projeto antes de iniciar novas etapas.
+4. **Dúvidas Técnicas:**
+   - Dúvidas sobre palavras técnicas? Consulte os glossários simples no repositório antes de começar a codificar.
