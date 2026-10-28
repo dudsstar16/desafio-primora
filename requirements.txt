@@ -1,0 +1,35 @@
+# ==========================================
+# Dependências do Projeto Primora
+# ==========================================
+
+# --- ETL e Manipulação de Dados ---
+# Pandas: biblioteca para ler, limpar e tratar dados em tabelas (DataFrames).
+pandas>=2.2.0
+
+# Requests: biblioteca para fazer chamadas HTTP (consultar APIs de CEP como ViaCEP).
+requests>=2.31.0
+
+# --- Banco de Dados PostgreSQL ---
+# Psycopg2-binary: conector que permite ao Python conversar com o banco PostgreSQL.
+psycopg2-binary>=2.9.9
+
+# --- Backend e API REST (Django) ---
+# Django: framework web principal para construir a aplicação e gerenciar o banco.
+django>=5.0.0
+
+# Django REST Framework (DRF): extensão do Django para criar APIs REST com facilidade.
+djangorestframework>=3.15.0
+
+# DRF Spectacular: gera automaticamente a documentação OpenAPI / Swagger e Redoc da API.
+drf-spectacular>=0.27.0
+
+# Django CORS Headers: gerencia permissões para que outras aplicações acessem a API.
+django-cors-headers>=4.3.0
+
+# Python Dotenv: lê variáveis de configuração de um arquivo .env (senhas, portas, etc.).
+python-dotenv>=1.0.1
+
+# --- Testes Automatizados ---
+# Pytest: ferramenta para rodar testes automáticos no código.
+pytest>=8.0.0
+pytest-django>=4.8.0

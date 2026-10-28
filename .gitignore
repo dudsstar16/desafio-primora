@@ -218,3 +218,26 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# ==========================================
+# Configurações do Projeto Primora
+# ==========================================
+
+# Variáveis de ambiente e segredos locais
+.env
+.env.*
+!.env.example
+
+# Banco de dados local (ex: testes SQLite)
+*.sqlite3
+db.sqlite3
+
+# Memória local do projeto e materiais internos de apoio (não sobem para o GitHub)
+memoria/
+memoria/*
+docs_local/
+*.local.md
+*.pptx
+*.ppt
+*.key
