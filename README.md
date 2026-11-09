@@ -39,7 +39,7 @@ desafio-primora/
 │
 ├── data/                   # Armazenamento de dados
 │   ├── raw/                # Arquivo CSV bruto original
-│   └── processed/          # Arquivos de dados após tratamento (futuro)
+│   └── processed/          # Banco, CSVs, cache e painel gerados pelo ETL
 │
 ├── etl/                    # Scripts do pipeline de ETL em Python
 │
@@ -64,11 +64,35 @@ desafio-primora/
 | `docs/modelagem` | MER (Modelo Entidade-Relacionamento) e DER (Diagrama) |
 | `docs/relatorios` | Relatório de decisões e trade-offs (escolhas técnicas) |
 | `data/raw` | CSV original fornecido pela empresa |
-| `data/processed` | Dados tratados exportados no futuro |
-| `etl` | Pipeline em Python (Extração, Limpeza e Carga) *(desenvolvimento futuro)* |
+| `data/processed` | Banco SQLite, CSVs limpos, auditoria, cache de CEP e painel HTML |
+| `etl` | Pipeline em Python: extração, limpeza, auditoria e carga |
 | `api` | Projeto Django e endpoints da API REST *(desenvolvimento futuro)* |
-| `tests` | Testes automatizados de normalização *(desenvolvimento futuro)* |
-| `scripts` | Scripts SQL e ferramentas de apoio *(desenvolvimento futuro)* |
+| `tests` | Testes automatizados das regras de limpeza e dos conflitos de CEP |
+| `scripts` | Script pronto para carregar as tabelas no PostgreSQL |
+
+---
+
+## ✅ Etapa 6 — Entregáveis do ETL
+
+O comando `python -m etl.pipeline` lê a base original e gera os arquivos abaixo.
+
+| Arquivo | Para que serve | Como usar |
+| :--- | :--- | :--- |
+| `data/processed/visualizar_tabelas.html` | Mostra as 3 tabelas em um painel visual. | Dê dois cliques e abra no Chrome ou Edge. |
+| `data/processed/banco_primora.sqlite3` | Banco pronto com 5 vendedores, 47 clientes e 188 registros de auditoria. | Aponte o Django para esse arquivo. Não precisa instalar um servidor de banco. |
+| `scripts/carga_postgresql.sql` | Recria e preenche as mesmas 3 tabelas no PostgreSQL. | Execute somente em banco vazio ou de teste. O script apaga tabelas existentes com os mesmos nomes. |
+| `data/processed/clientes_limpos.csv` | Tabela de clientes já tratada. | Abra no Excel, LibreOffice ou em outro programa que leia CSV. |
+| `data/processed/vendedores_limpos.csv` | Tabela de vendedores sem duplicações. | Abra no Excel, LibreOffice ou em outro programa que leia CSV. |
+| `data/processed/auditoria_etl.csv` | Histórico das mudanças feitas pelo ETL. | Use para conferir o valor anterior, o novo valor e a regra aplicada. |
+| `data/processed/cep_cache.json` | Guarda respostas de CEP já consultadas. | O pipeline usa automaticamente para evitar consultas repetidas. |
+| `docs/arquitetura/guia_banco_para_equipe_api.md` | Explica como conectar o Django ao banco. | Leia antes de iniciar os models e o Django Admin. |
+| `docs/arquitetura/regras_negocio_etl.md` | Explica as regras de limpeza. | Consulte para entender por que cada dado foi alterado. |
+| `docs/modelagem/mer_der.md` | Mostra as tabelas e os relacionamentos. | Use como referência para criar os models. |
+| `docs/relatorios/relatorio_tradeoffs_etl.md` | Resume decisões, limites, cache e guardrail de conflito. | Use na revisão da equipe e na apresentação para a banca. |
+
+> **Regra importante:** `auditoria_etl` deve aparecer somente no Django Admin. Ela não deve ter rota pública na API.
+
+> **Atenção:** antes de usar o script PostgreSQL em um banco com dados, faça backup. O arquivo executa `DROP TABLE` para substituir as tabelas `vendedor`, `cliente` e `auditoria_etl`.
 
 ---
 
@@ -83,13 +107,18 @@ desafio-primora/
 - [x] Adicionar a base original `02-clientes_distribuidora_vetor.csv` em `data/raw/`
 - [x] Convidar os integrantes do grupo para o repositório no GitHub
 
-### Etapas Futuras (Próximos Passos)
-- [ ] **Etapa 2:** Modelagem do banco (MER/DER) e planejamento da tabela de auditoria.
-- [ ] **Etapa 3:** Desenvolvimento do pipeline ETL em Python (normalização de bairros, CEPs via ViaCEP/BrasilAPI, CNPJ, telefone e datas).
-- [ ] **Etapa 4:** Testes unitários automatizados da limpeza de dados com chamadas simuladas (*mocks*).
-- [ ] **Etapa 5:** Criação do projeto Django, models, migrações e carga dos dados no PostgreSQL.
-- [ ] **Etapa 6:** Implementação das rotas da API REST (CRUD, filtros por bairro/vendedor e autenticação).
-- [ ] **Etapa 7:** Documentação interativa da API com `drf-spectacular` (Redoc/Swagger) e relatório final.
+### Parte 1 — ETL
+- [x] **Etapa 2:** Modelagem do banco e planejamento da auditoria.
+- [x] **Etapa 3:** Pipeline de limpeza de bairros, CEPs, CNPJ, telefone e datas.
+- [x] **Etapa 4:** Testes automatizados com chamadas de CEP simuladas.
+- [x] **Etapa 5:** Geração das tabelas em SQLite, CSV e script PostgreSQL.
+- [x] **Etapa 6:** Documentação, painel visual e relatório de decisões.
+
+### Parte 2 — Próximos Passos
+- [ ] Criar o projeto Django, os models e as migrações.
+- [ ] Implementar CRUD, filtros e autenticação da API.
+- [ ] Registrar a auditoria somente no Django Admin.
+- [ ] Publicar a documentação OpenAPI, Redoc e Swagger.
 
 ---
 

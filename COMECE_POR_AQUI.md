@@ -76,15 +76,15 @@ Aqui está a explicação do que ela é:
 | Pasta | O que vai dentro? |
 | :--- | :--- |
 | `data/raw/` | O arquivo original `02-clientes_distribuidora_vetor.csv` (intocado). |
-| `data/processed/` | Onde salvaremos os dados depois de tratados. |
+| `data/processed/` | Banco SQLite, CSVs, cache de CEP e painel HTML já gerados pelo ETL. |
 | `docs/requisitos/` | Os PDFs oficiais com todas as regras do desafio. |
 | `docs/arquitetura/` | Planejamento técnico e desenhos de como tudo se conecta. |
 | `docs/modelagem/` | Desenho das tabelas do banco de dados (MER e DER). |
 | `docs/relatorios/` | Relatório final explicando as decisões que tomamos. |
-| `etl/` | Nossos códigos em Python que limpam os dados *(passo futuro)*. |
+| `etl/` | Códigos em Python que extraem, limpam, auditam e salvam os dados. |
 | `api/` | Nosso sistema web em Django com as rotas *(passo futuro)*. |
-| `tests/` | Testes automáticos para garantir que a limpeza não errou *(passo futuro)*. |
-| `scripts/` | Comandos extras em SQL e utilitários *(passo futuro)*. |
+| `tests/` | Testes automáticos que conferem as principais regras do ETL. |
+| `scripts/` | Script que cria e preenche as tabelas no PostgreSQL. |
 
 ---
 
@@ -107,5 +107,9 @@ Para ninguém apagar o trabalho do colega sem querer:
 
 - **Pergunta:** O que eu devo fazer agora no meu computador?  
   **Resposta:** Clone o repositório, crie seu `venv`, ative o `venv` e instale as dependências (`pip install -r requirements.txt`).
-- **Pergunta:** Já posso começar a escrever o código do Django ou da API?  
-  **Resposta:** Ainda não! Nosso próximo passo em grupo é a **Modelagem do Banco de Dados** (desenhar as tabelas).
+- **Pergunta:** Como vejo o resultado sem instalar um banco?
+  **Resposta:** Abra `data/processed/visualizar_tabelas.html` no navegador.
+- **Pergunta:** Como uso os dados no Django?
+  **Resposta:** Leia `docs/arquitetura/guia_banco_para_equipe_api.md`. O guia mostra a opção SQLite e a opção PostgreSQL.
+- **Pergunta:** Qual é o próximo passo do grupo?
+  **Resposta:** Construir a API Django usando as tabelas e regras que já estão prontas.
