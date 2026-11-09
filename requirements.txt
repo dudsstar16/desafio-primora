@@ -20,6 +20,8 @@ django>=5.0.0
 # Django REST Framework (DRF): extensão do Django para criar APIs REST com facilidade.
 djangorestframework>=3.15.0
 
+django-filter>=24.2
+
 # DRF Spectacular: gera automaticamente a documentação OpenAPI / Swagger e Redoc da API.
 drf-spectacular>=0.27.0
 
@@ -33,3 +35,5 @@ python-dotenv>=1.0.1
 # Pytest: ferramenta para rodar testes automáticos no código.
 pytest>=8.0.0
 pytest-django>=4.8.0
+
+

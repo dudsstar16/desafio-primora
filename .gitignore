@@ -158,6 +158,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+meuambiente/
 
 # Spyder project settings
 .spyderproject
@@ -241,3 +242,4 @@ docs_local/
 *.pptx
 *.ppt
 *.key
+
