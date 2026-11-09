@@ -1,0 +1,48 @@
+﻿id_cliente;razao_social;cnpj_normalizado;telefone_normalizado;email;bairro_normalizado;cep_normalizado;cidade;uf;data_cadastro_normalizado;vendedor_id
+CLI0001;Mercadinho Boa Vista;84959310341316;61970855700;contato@mercadinhobo.com.br;Águas Claras;71926750;Brasília;DF;2022-06-21;1
+CLI0002;Comercial São Judas;28327648350305;61953862084;contato@comercialsão.com.br;Taguatinga;72140010;Brasília;DF;2023-10-07;2
+CLI0003;Armarinhos Silva & Cia;42388496965328;61924891771;contato@armarinhossi.com.br;Taguatinga;72140010;Brasília;DF;2022-02-28;2
+CLI0004;Empório Vale Verde;69784801845146;61984331053;contato@empóriovalev.com.br;Águas Claras;71929000;Brasília;DF;2023-12-24;3
+CLI0005;Mercearia Dois Irmãos;89325288095701;61951273847;contato@merceariadoi.com.br;Taguatinga;;Brasília;DF;2022-01-08;3
+CLI0006;Casa das Tintas Ipê;82278248963834;61971188177;contato@casadastinta.com.br;Águas Claras;;Brasília;DF;2021-08-17;2
+CLI0007;Distribuidora Popular Centro-Oeste;83930103105183;61999788677;contato@distribuidor.com.br;Taguatinga;;Brasília;DF;2025-04-16;2
+CLI0008;Bazar Estrela Dourada;31165667010651;61941394116;contato@bazarestrela.com.br;Vicente Pires;72006400;Brasília;DF;2022-08-18;4
+CLI0009;Supermercado Nova Aliança;10801326773602;61910357396;contato@supermercado.com.br;Águas Claras;71926750;Brasília;DF;2023-08-09;4
+CLI0010;Papelaria Horizonte;34309805009788;61919319320;contato@papelariahor.com.br;Águas Claras;71950000;Brasília;DF;2021-03-03;3
+CLI0011;Ferragens União;93990916998543;61942035886;contato@ferragensuni.com.br;Vicente Pires;72006400;Brasília;DF;2022-07-09;1
+CLI0012;Mercado Cantinho do Sabor;79911838425135;61931172421;contato@mercadocanti.com.br;Águas Claras;71950000;Brasília;DF;2023-09-15;3
+CLI0013;Loja Fatima Confecções;24118244935348;61951141832;contato@lojafatimaco.com.br;Guará;;Brasília;DF;2024-11-03;1
+CLI0014;Depósito São Roque;27868011280598;61980413088;contato@depósitosãor.com.br;Taguatinga;;Brasília;DF;2023-05-02;5
+CLI0015;Comercial Rio Bonito;69232260256342;6134911634;contato@comercialrio.com.br;Águas Claras;71926750;Brasília;DF;2022-08-28;2
+CLI0016;Minimercado Vitória Régia;36541458685014;61953491626;contato@minimercadov.com.br;Vicente Pires;72006400;Brasília;DF;2024-10-04;1
+CLI0017;Casa de Carnes Ouro Fino;93406088356159;61999038359;contato@casadecarnes.com.br;Taguatinga;72110800;Brasília;DF;2023-02-28;3
+CLI0018;Armazém Planalto;82366299468044;61980436279;contato@armazémplana.com.br;Vicente Pires;72006530;Brasília;DF;2024-08-15;2
+CLI0019;Bazar Flor de Lis;48951343320037;6139702193;contato@bazarflordel.com.br;Guará;;Brasília;DF;2025-07-15;2
+CLI0020;Mercado Bom Preço DF;20163287083172;61997026198;contato@mercadobompr.com.br;Taguatinga;72130010;Brasília;DF;2025-08-25;3
+CLI0021;Distribuidora Cerrado Norte;77434873471434;61952910691;contato@distribuidor.com.br;Taguatinga;72140010;Brasília;DF;2022-02-18;2
+CLI0022;Comercial Águas do Sul;66587603669096;61910966763;contato@comercialágu.com.br;Taguatinga;72110010;Brasília;DF;2024-07-10;3
+CLI0023;Padaria Trigo Dourado;34670656272980;61914442375;contato@padariatrigo.com.br;Taguatinga;72140010;Brasília;DF;2022-07-21;4
+CLI0024;Loja de Utilidades Girassol;37556464170805;61921241659;contato@lojadeutilid.com.br;Águas Claras;;Brasília;DF;2022-01-25;2
+CLI0025;Empório do Produtor;27193745299124;6136921420;contato@empóriodopro.com.br;Taguatinga;;Brasília;DF;2024-10-10;4
+CLI0026;Mercadinho Recanto Feliz;49190586518506;61927298102;contato@mercadinhore.com.br;Vicente Pires;;Brasília;DF;2024-11-12;2
+CLI0027;Casa da Limpeza Total;87769453147379;6137847209;contato@casadalimpez.com.br;Guará;;Brasília;DF;2024-01-11;1
+CLI0028;Comercial Serra Azul;49480831367837;61983421282;contato@comercialser.com.br;Águas Claras;71900100;Brasília;DF;2022-05-03;4
+CLI0029;Armazém Fazendinha;85685574443135;6138609779;contato@armazémfazen.com.br;Águas Claras;71900000;Brasília;DF;2022-12-25;2
+CLI0030;Bazar Nova Esperança;34352408240084;61990422680;contato@bazarnovaesp.com.br;Águas Claras;71901010;Brasília;DF;2025-01-28;1
+CLI0031;Distribuidora Vale do Alvorada;04711671902294;6133542940;contato@distribuidor.com.br;Guará;;Brasília;DF;2025-07-18;3
+CLI0032;Mercearia Central DF;74964990913341;61949293847;contato@merceariacen.com.br;Águas Claras;71950000;Brasília;DF;2022-02-18;5
+CLI0033;Loja Bom Retiro;03447134936183;61953523330;contato@lojabomretir.com.br;Taguatinga;72110800;Brasília;DF;2022-01-03;1
+CLI0034;Comercial Duas Palmeiras;17464887719065;6133561423;contato@comercialdua.com.br;Guará;;Brasília;DF;2025-04-03;3
+CLI0035;Casa das Bebidas Real;02787429671756;61953091709;contato@casadasbebid.com.br;Águas Claras;71925000;Brasília;DF;2022-02-22;1
+CLI0036;Mercadinho Nossa Senhora;07154516808760;61994946927;contato@mercadinhono.com.br;Taguatinga;72130010;Brasília;DF;2024-08-20;5
+CLI0037;Armarinhos Ponto Certo;10932480861317;6137633522;contato@armarinhospo.com.br;Águas Claras;71929000;Brasília;DF;2023-12-16;3
+CLI0038;Empório Chão Vermelho;78263982146584;6133895891;contato@empóriochãov.com.br;Vicente Pires;72006530;Brasília;DF;2025-10-27;4
+CLI0039;Distribuidora Horizonte Azul;58867533963605;61972467325;contato@distribuidor.com.br;Águas Claras;;Brasília;DF;2022-11-22;4
+CLI0040;Casa de Materiais Rocha;71870262174596;6139726383;contato@casademateri.com.br;Águas Claras;;Brasília;DF;2025-11-28;4
+CLI0041;Mercado Popular Central;13431611724005;6134006873;contato@mercadopopul.com.br;Águas Claras;71901010;Brasília;DF;2022-07-12;2
+CLI0042;Comercial Passo Firme;19693792374740;61957129955;contato@comercialpas.com.br;Águas Claras;71906500;Brasília;DF;2024-02-06;1
+CLI0043;Bazar Sol Nascente;43671369594406;61911086890;contato@bazarsolnasc.com.br;Águas Claras;71901010;Brasília;DF;2021-11-19;3
+CLI0044;Depósito Cerrado Sul;53394210470952;6134026352;contato@depósitocerr.com.br;Águas Claras;71900100;Brasília;DF;2022-07-24;2
+CLI0045;Loja Multi Utilidades;47451712368516;6133709791;contato@lojamultiuti.com.br;Águas Claras;71900100;Brasília;DF;2023-08-04;1
+CLI0046;Armazém Boa Colheita;37098593174612;6131385986;contato@armazémboaco.com.br;Guará;;Brasília;DF;2021-02-16;2
+CLI0047;Mercadinho Sem Endereço Completo;82675869261796;61914391105;contato@semendereco.com.br;Não Informado;;Brasília;DF;2022-06-23;4

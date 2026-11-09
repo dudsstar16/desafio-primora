@@ -1,0 +1,128 @@
+{
+  "71926750": {
+    "cep": "71926750",
+    "logradouro": "Avenida das Castanheiras",
+    "bairro_api": "Sul (Águas Claras)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "72140010": {
+    "cep": "72140010",
+    "logradouro": "QNM 32",
+    "bairro_api": "Taguatinga Norte (Taguatinga)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "71929000": {
+    "cep": "71929000",
+    "logradouro": "Quadra 209",
+    "bairro_api": "Sul (Águas Claras)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "72006400": {
+    "cep": "72006400",
+    "logradouro": "Rua 4",
+    "bairro_api": "Setor Habitacional Vicente Pires",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "71950000": {
+    "cep": "71950000",
+    "logradouro": "Avenida Sibipiruna",
+    "bairro_api": "Sul (Águas Claras)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "72110800": {
+    "cep": "72110800",
+    "logradouro": "Área Especial",
+    "bairro_api": "Taguatinga Norte (Taguatinga)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "72006530": {
+    "cep": "72006530",
+    "logradouro": "Rua 4A",
+    "bairro_api": "Setor Habitacional Vicente Pires",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "72130010": {
+    "cep": "72130010",
+    "logradouro": "QNG 1",
+    "bairro_api": "Taguatinga Norte (Taguatinga)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "72110010": {
+    "cep": "72110010",
+    "logradouro": "CNB 1",
+    "bairro_api": "Taguatinga Norte (Taguatinga)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "71900100": {
+    "cep": "71900100",
+    "logradouro": "Avenida das Araucárias",
+    "bairro_api": "Sul (Águas Claras)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "71900000": {
+    "cep": "71900000",
+    "logradouro": "Avenida Parque Águas Claras",
+    "bairro_api": "Norte (Águas Claras)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "71901010": {
+    "cep": "71901010",
+    "logradouro": "Rua 36 Norte",
+    "bairro_api": "Norte (Águas Claras)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "71925000": {
+    "cep": "71925000",
+    "logradouro": "Rua 9 Sul",
+    "bairro_api": "Sul (Águas Claras)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  },
+  "71906500": {
+    "cep": "71906500",
+    "logradouro": "Quadra 101",
+    "bairro_api": "Norte (Águas Claras)",
+    "localidade": "Brasília",
+    "uf": "DF",
+    "valido": true,
+    "fonte": "ViaCEP"
+  }
+}

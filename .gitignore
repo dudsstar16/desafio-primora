@@ -229,9 +229,11 @@ __marimo__/
 .env.*
 !.env.example
 
-# Banco de dados local (ex: testes SQLite)
-*.sqlite3
+# Banco de dados local temporário do Django
 db.sqlite3
+
+# Libera o banco de dados pronto do ETL para subir no GitHub (para a equipe da API acessar direto!)
+!data/processed/banco_primora.sqlite3
 
 # Memória local do projeto e materiais internos de apoio (não sobem para o GitHub)
 memoria/
