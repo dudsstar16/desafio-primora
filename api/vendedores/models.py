@@ -1,0 +1,14 @@
+
+from django.db import models
+
+
+class Vendedor(models.Model):
+    id_vendedor = models.BigAutoField(primary_key=True)
+    nome_vendedor = models.CharField(max_length=150)
+
+    class Meta:
+        verbose_name = "Vendedor"
+        verbose_name_plural = "Vendedores"
+
+    def __str__(self):
+        return self.nome_vendedor
