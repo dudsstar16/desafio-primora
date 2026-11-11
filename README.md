@@ -5,6 +5,9 @@ O objetivo é tratar dados cadastrais inconsistentes de clientes (ETL em Python)
 
 > 👉 **Primeira vez no repositório?**  
 > Leia nosso guia super simples e direto para o grupo: **[COMECE_POR_AQUI.md](COMECE_POR_AQUI.md)**.
+> 
+> 📋 **Gestão Ágil e Sprints (Scrum / Trello):**  
+> Acompanhe nossas tarefas, Sprints e Product Backlog no **[Quadro Oficial do Trello — Desafio Primora (IFB)](https://trello.com/b/EfR7pCde/desafio-primora-ifb-projeto-integrador)** e na aba **[Issues do GitHub](https://github.com/dudsstar16/desafio-primora/issues)**.
 
 ---
 
@@ -114,11 +117,12 @@ O comando `python -m etl.pipeline` lê a base original e gera os arquivos abaixo
 - [x] **Etapa 5:** Geração das tabelas em SQLite, CSV e script PostgreSQL.
 - [x] **Etapa 6:** Documentação, painel visual e relatório de decisões.
 
-### Parte 2 — Próximos Passos
-- [ ] Criar o projeto Django, os models e as migrações.
-- [ ] Implementar CRUD, filtros e autenticação da API.
-- [ ] Registrar a auditoria somente no Django Admin.
-- [ ] Publicar a documentação OpenAPI, Redoc e Swagger.
+### Parte 2 — API REST em Django (Andamento das Sprints)
+- [x] Criar o projeto Django base e configurar integração com o banco do ETL (`SQLite` / `PostgreSQL`).
+- [x] Implementar módulo e CRUD de Vendedores (`/api/vendedores/`), autenticação por Token (`/api/auth/token/`), permissão global `IsAuthenticatedOrReadOnly`, registro no Admin e testes automatizados (PR #1 — `@alderiana`).
+- [ ] Implementar Model, Serializer e CRUD de Clientes (`/api/clientes/`) e rotas de filtro por bairro e por vendedor (`@Hefestos27`).
+- [ ] Registrar `Cliente` e `Auditoria` (somente no Django Admin, sem expor `auditoria_etl` na API).
+- [ ] Publicar a documentação interativa OpenAPI, Redoc e Swagger (`drf-spectacular`).
 
 ---
 
