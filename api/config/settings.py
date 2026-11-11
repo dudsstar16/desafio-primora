@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'drf_spectacular',  
     'django_filters',
     'rest_framework.authtoken',
+    'clientes',
 ]
 
 MIDDLEWARE = [
@@ -77,9 +78,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+       'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR.parent / 'data' / 'processed' / 'banco_primora.sqlite3',
     }
 }
 
