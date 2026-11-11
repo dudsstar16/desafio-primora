@@ -16,6 +16,8 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent
+load_dotenv(PROJECT_ROOT / ".env")
 load_dotenv(BASE_DIR / ".env")
 
 
@@ -79,17 +81,28 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
+# Se DB_NAME ou POSTGRES_DB estiver configurado no .env, usa PostgreSQL.
+# Caso contrário, usa automaticamente o banco SQLite já populado pelo ETL!
+_db_name = os.getenv('DB_NAME') or os.getenv('POSTGRES_DB')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+if _db_name:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _db_name,
+            'USER': os.getenv('DB_USER') or os.getenv('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD') or os.getenv('POSTGRES_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST') or os.getenv('POSTGRES_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT') or os.getenv('POSTGRES_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': PROJECT_ROOT / 'data' / 'processed' / 'banco_primora.sqlite3',
+        }
+    }
 
 
 # Password validation

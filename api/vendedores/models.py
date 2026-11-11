@@ -7,6 +7,7 @@ class Vendedor(models.Model):
     nome_vendedor = models.CharField(max_length=150)
 
     class Meta:
+        db_table = "vendedor"
         verbose_name = "Vendedor"
         verbose_name_plural = "Vendedores"
 
