@@ -1,14 +1,15 @@
 from rest_framework import viewsets
-from .models import Cliente
-from .serializers import ClienteSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from .models import Cliente
+from .serializers import ClienteSerializer
 
 
 class ClienteViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
-    
+
     @action(detail=False, methods=['get'], url_path='bairro/(?P<nome>[^/.]+)')
     def buscar_por_bairro(self, request, nome=None):
         clientes = Cliente.objects.filter(bairro_normalizado__iexact=nome)

@@ -1,10 +1,15 @@
 # Desafio Técnico — Distribuidora Vetor (Primora)
 
+![CI Status](https://github.com/dudsstar16/desafio-primora/actions/workflows/ci.yml/badge.svg)
+
 Projeto integrado de Engenharia e Backend desenvolvido como parte do Desafio Primora.  
 O objetivo é tratar dados cadastrais inconsistentes de clientes (ETL em Python), armazená-los em banco relacional (PostgreSQL) e disponibilizá-los através de uma API REST (Django REST Framework).
 
 > 👉 **Primeira vez no repositório?**  
 > Leia nosso guia super simples e direto para o grupo: **[COMECE_POR_AQUI.md](COMECE_POR_AQUI.md)**.
+> 
+> 📋 **Gestão Ágil e Sprints (Scrum / Trello):**  
+> Acompanhe nossas tarefas, Sprints e Product Backlog no **[Quadro Oficial do Trello — Desafio Primora (IFB)](https://trello.com/b/EfR7pCde/desafio-primora-ifb-projeto-integrador)** e na aba **[Issues do GitHub](https://github.com/dudsstar16/desafio-primora/issues)**.
 
 ---
 
@@ -66,9 +71,27 @@ desafio-primora/
 | `data/raw` | CSV original fornecido pela empresa |
 | `data/processed` | Banco SQLite, CSVs limpos, auditoria, cache de CEP e painel HTML |
 | `etl` | Pipeline em Python: extração, limpeza, auditoria e carga |
-| `api` | Projeto Django e endpoints da API REST *(desenvolvimento futuro)* |
+| `api` | Projeto Django e endpoints da API REST (`vendedores`, `clientes` e autenticação) |
 | `tests` | Testes automatizados das regras de limpeza e dos conflitos de CEP |
 | `scripts` | Script pronto para carregar as tabelas no PostgreSQL |
+| `.github/workflows` | Automação CI/CD (GitHub Actions) que executa os testes do ETL e da API a cada Push/PR |
+
+---
+
+## 🗂️ Rastreabilidade das Etapas do ETL (Mapeamento Trello ↔ Repositório)
+
+Cada cartão do nosso **[Quadro Scrum no Trello](https://trello.com/b/EfR7pCde/desafio-primora-ifb-projeto-integrador)** corresponde diretamente aos módulos e documentos entregues neste repositório:
+
+| Etapa / Cartão no Trello | Código e Documentação Comprobatória no Repositório | Status |
+| :--- | :--- | :---: |
+| **1. Desenhar como o projeto vai funcionar** | [`README.md`](README.md), [`COMECE_POR_AQUI.md`](COMECE_POR_AQUI.md), [`docs/arquitetura/regras_negocio_etl.md`](docs/arquitetura/regras_negocio_etl.md) | ✅ Concluído |
+| **2. ETL - Planejar como guardar os dados** | [`docs/modelagem/mer_der.md`](docs/modelagem/mer_der.md), [`docs/arquitetura/guia_banco_para_equipe_api.md`](docs/arquitetura/guia_banco_para_equipe_api.md) | ✅ Concluído |
+| **3. ETL - Preparar e realizar extração dos dados** | [`etl/extract.py`](etl/extract.py), [`data/raw/02-clientes_distribuidora_vetor.csv`](data/raw/02-clientes_distribuidora_vetor.csv) | ✅ Concluído |
+| **4. ETL - Identificar e normalizar inconsistências** | [`etl/transform_fields.py`](etl/transform_fields.py), [`etl/transform_address.py`](etl/transform_address.py), [`data/processed/clientes_limpos.csv`](data/processed/clientes_limpos.csv) | ✅ Concluído |
+| **5. ETL - Validar e enriquecer informações de CEP** | [`etl/cep_service.py`](etl/cep_service.py), [`data/processed/cep_cache.json`](data/processed/cep_cache.json) | ✅ Concluído |
+| **6. ETL - Implementar auditoria das transformações** | [`etl/audit.py`](etl/audit.py), [`data/processed/auditoria_etl.csv`](data/processed/auditoria_etl.csv) (188 registros) | ✅ Concluído |
+| **7. ETL - Desenvolver e executar o pipeline ETL** | [`etl/pipeline.py`](etl/pipeline.py), [`etl/load.py`](etl/load.py), [`data/processed/banco_primora.sqlite3`](data/processed/banco_primora.sqlite3), [`scripts/carga_postgresql.sql`](scripts/carga_postgresql.sql), [`data/processed/visualizar_tabelas.html`](data/processed/visualizar_tabelas.html) | ✅ Concluído |
+| **8. ETL - Testar e documentar o processo ETL** | [`tests/test_etl.py`](tests/test_etl.py), [`.github/workflows/ci.yml`](.github/workflows/ci.yml), [`docs/relatorios/relatorio_tradeoffs_etl.md`](docs/relatorios/relatorio_tradeoffs_etl.md) | ✅ Concluído |
 
 ---
 
@@ -114,11 +137,12 @@ O comando `python -m etl.pipeline` lê a base original e gera os arquivos abaixo
 - [x] **Etapa 5:** Geração das tabelas em SQLite, CSV e script PostgreSQL.
 - [x] **Etapa 6:** Documentação, painel visual e relatório de decisões.
 
-### Parte 2 — Próximos Passos
-- [ ] Criar o projeto Django, os models e as migrações.
-- [ ] Implementar CRUD, filtros e autenticação da API.
-- [ ] Registrar a auditoria somente no Django Admin.
-- [ ] Publicar a documentação OpenAPI, Redoc e Swagger.
+### Parte 2 — API REST em Django (Andamento das Sprints)
+- [x] Criar o projeto Django base e configurar integração com o banco do ETL (`SQLite` / `PostgreSQL`).
+- [x] Implementar módulo e CRUD de Vendedores (`/api/vendedores/`), autenticação por Token (`/api/auth/token/`), permissão global `IsAuthenticatedOrReadOnly`, registro no Admin e testes automatizados (PR #1 — `@alderiana`).
+- [ ] Implementar Model, Serializer e CRUD de Clientes (`/api/clientes/`) e rotas de filtro por bairro e por vendedor (`@Hefestos27`).
+- [ ] Registrar `Cliente` e `Auditoria` (somente no Django Admin, sem expor `auditoria_etl` na API).
+- [ ] Publicar a documentação interativa OpenAPI, Redoc e Swagger (`drf-spectacular`).
 
 ---
 

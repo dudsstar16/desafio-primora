@@ -94,12 +94,14 @@ Para ninguém apagar o trabalho do colega sem querer:
 
 1. **Nunca programe na branch `main`:**  
    A branch `main` é sagrada. Ela só recebe código testado e aprovado.
-2. **Crie uma branch para a sua tarefa:**  
+2. **Acompanhe sua tarefa no Trello e nas Issues:**  
+   Nosso quadro Scrum oficial fica no **[Trello — Desafio Primora (IFB)](https://trello.com/b/EfR7pCde/desafio-primora-ifb-projeto-integrador)** e espelhado nas **[Issues do GitHub](https://github.com/dudsstar16/desafio-primora/issues)**.
+3. **Crie uma branch para a sua tarefa:**  
    Exemplo: `git checkout -b feature/nome-da-sua-tarefa`.
-3. **Antes de começar o dia:**  
+4. **Antes de começar o dia:**  
    Rode `git pull origin main` para baixar as novidades que seus colegas enviaram.
-4. **Quando terminar sua parte:**  
-   Envie sua branch com `git push` e abra um **Pull Request** no GitHub para o grupo revisar junto.
+5. **Quando terminar sua parte:**  
+   Envie sua branch com `git push` e abra um **Pull Request** no GitHub para o grupo revisar junto (nosso robô do GitHub Actions vai testar tudo automaticamente!).
 
 ---
 

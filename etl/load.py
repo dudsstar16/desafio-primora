@@ -264,11 +264,12 @@ def generate_postgres_sql_script(
 
 def try_load_into_postgresql(sql_script_path: Path) -> tuple[bool, str]:
     """
-    Se houver configuração de PostgreSQL no ambiente (variável DATABASE_URL ou POSTGRES_PASSWORD),
-    conecta automaticamente via psycopg2 e carrega as 3 tabelas no PostgreSQL!
+    Se houver configuração de PostgreSQL no ambiente (variável DATABASE_URL,
+    POSTGRES_PASSWORD ou DB_PASSWORD), conecta automaticamente via psycopg2
+    e carrega as 3 tabelas no PostgreSQL!
     """
     db_url = os.getenv("DATABASE_URL")
-    pg_password = os.getenv("POSTGRES_PASSWORD")
+    pg_password = os.getenv("POSTGRES_PASSWORD") or os.getenv("DB_PASSWORD")
     if not db_url and not pg_password:
         return False, "Variáveis de conexão PostgreSQL não definidas no .env (carga SQL e SQLite já geradas)."
 
@@ -279,10 +280,10 @@ def try_load_into_postgresql(sql_script_path: Path) -> tuple[bool, str]:
             conn = psycopg2.connect(db_url)
         else:
             conn = psycopg2.connect(
-                host=os.getenv("POSTGRES_HOST", "localhost"),
-                port=int(os.getenv("POSTGRES_PORT", "5432")),
-                dbname=os.getenv("POSTGRES_DB", "primora_db"),
-                user=os.getenv("POSTGRES_USER", "postgres"),
+                host=os.getenv("POSTGRES_HOST") or os.getenv("DB_HOST", "localhost"),
+                port=int(os.getenv("POSTGRES_PORT") or os.getenv("DB_PORT", "5432")),
+                dbname=os.getenv("POSTGRES_DB") or os.getenv("DB_NAME", "primora_api"),
+                user=os.getenv("POSTGRES_USER") or os.getenv("DB_USER", "postgres"),
                 password=pg_password,
             )
         with conn:

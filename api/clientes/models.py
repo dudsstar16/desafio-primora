@@ -12,8 +12,13 @@ class Cliente(models.Model):
     cidade = models.CharField(max_length=50)
     uf = models.CharField(max_length=2)
     data_cadastro_normalizado = models.DateField()
-    vendedor_id = models.IntegerField()
+    vendedor = models.ForeignKey(
+    'vendedores.Vendedor',
+    on_delete=models.DO_NOTHING,
+    db_column='vendedor_id',
+    related_name='clientes'
+)
 
     class Meta:
         db_table = 'cliente'
-        managed = False
+        managed = True
