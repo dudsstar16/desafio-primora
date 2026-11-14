@@ -108,6 +108,7 @@ O comando `python -m etl.pipeline` lê a base original e gera os arquivos abaixo
 | `data/processed/vendedores_limpos.csv` | Tabela de vendedores sem duplicações. | Abra no Excel, LibreOffice ou em outro programa que leia CSV. |
 | `data/processed/auditoria_etl.csv` | Histórico das mudanças feitas pelo ETL. | Use para conferir o valor anterior, o novo valor e a regra aplicada. |
 | `data/processed/cep_cache.json` | Guarda respostas de CEP já consultadas. | O pipeline usa automaticamente para evitar consultas repetidas. |
+| `docs/arquitetura/arquitetura_sistema.md` | **Arquitetura Ponta a Ponta do Sistema** com fluxograma visual das 5 camadas. | Abra no GitHub para visualizar o diagrama completo do projeto. |
 | `docs/arquitetura/guia_banco_para_equipe_api.md` | Explica como conectar o Django ao banco. | Leia antes de iniciar os models e o Django Admin. |
 | `docs/arquitetura/regras_negocio_etl.md` | Explica as regras de limpeza. | Consulte para entender por que cada dado foi alterado. |
 | `docs/modelagem/mer_der.md` | Mostra as tabelas e os relacionamentos. | Use como referência para criar os models. |
