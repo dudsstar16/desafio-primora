@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular',
     'clientes',
     'vendedores',
 ]
@@ -160,4 +161,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API Primora',
+    'DESCRIPTION': 'Documentação da API da Distribuidora Vetor',
+    'VERSION': '1.0.0',
+    'REDOC_DIST': 'https://cdn.jsdelivr.net/npm/redoc@2.1.5',
 }
