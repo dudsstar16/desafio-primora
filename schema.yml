@@ -1,7 +1,8 @@
 openapi: 3.0.3
 info:
-  title: ''
-  version: 0.0.0
+  title: API Primora — Distribuidora Vetor
+  version: 1.0.0
+  description: Documentação interativa da API REST de Clientes e Vendedores (após tratamento ETL)
 paths:
   /api/auth/token/:
     post:
@@ -30,6 +31,215 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthToken'
           description: ''
+  /api/clientes/:
+    get:
+      operationId: clientes_list
+      description: Lista todos os clientes tratados e padronizados pelo pipeline de ETL.
+      parameters:
+      - in: query
+        name: bairro_normalizado
+        schema:
+          type: string
+      - in: query
+        name: vendedor
+        schema:
+          type: integer
+      tags:
+      - clientes
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+          description: ''
+    post:
+      operationId: clientes_create
+      tags:
+      - clientes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+  /api/clientes/{id_cliente}/:
+    get:
+      operationId: clientes_retrieve
+      parameters:
+      - in: path
+        name: id_cliente
+        schema:
+          type: string
+        description: Identificador único do cliente (ex. CLI0001).
+        required: true
+      tags:
+      - clientes
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+    put:
+      operationId: clientes_update
+      parameters:
+      - in: path
+        name: id_cliente
+        schema:
+          type: string
+        required: true
+      tags:
+      - clientes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+    patch:
+      operationId: clientes_partial_update
+      parameters:
+      - in: path
+        name: id_cliente
+        schema:
+          type: string
+        required: true
+      tags:
+      - clientes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCliente'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCliente'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCliente'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+    delete:
+      operationId: clientes_destroy
+      parameters:
+      - in: path
+        name: id_cliente
+        schema:
+          type: string
+        required: true
+      tags:
+      - clientes
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/clientes/bairro/{nome}/:
+    get:
+      operationId: clientes_buscar_por_bairro
+      description: |-
+        Lista clientes por bairro normalizado.
+        Aceita tanto o nome exato ('Águas Claras') quanto variações sem acento
+        ou informais ('aguas claras', 'guara ii', 'vte pires') usando a regra do ETL!
+      parameters:
+      - in: path
+        name: nome
+        schema:
+          type: string
+        required: true
+      tags:
+      - clientes
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+          description: ''
+  /api/clientes/vendedor/{id_vendedor}/:
+    get:
+      operationId: clientes_buscar_por_vendedor
+      description: Lista clientes atendidos por um vendedor específico.
+      parameters:
+      - in: path
+        name: id_vendedor
+        schema:
+          type: string
+        required: true
+      tags:
+      - clientes
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+          description: ''
   /api/schema/:
     get:
       operationId: schema_retrieve
@@ -46,111 +256,6 @@ paths:
           enum:
           - json
           - yaml
-      - in: query
-        name: lang
-        schema:
-          type: string
-          enum:
-          - af
-          - ar
-          - ar-dz
-          - ast
-          - az
-          - be
-          - bg
-          - bn
-          - br
-          - bs
-          - ca
-          - ckb
-          - cs
-          - cy
-          - da
-          - de
-          - dsb
-          - el
-          - en
-          - en-au
-          - en-gb
-          - eo
-          - es
-          - es-ar
-          - es-co
-          - es-mx
-          - es-ni
-          - es-ve
-          - et
-          - eu
-          - fa
-          - fi
-          - fr
-          - fy
-          - ga
-          - gd
-          - gl
-          - he
-          - hi
-          - hr
-          - hsb
-          - ht
-          - hu
-          - hy
-          - ia
-          - id
-          - ig
-          - io
-          - is
-          - it
-          - ja
-          - ka
-          - kab
-          - kk
-          - km
-          - kn
-          - ko
-          - ky
-          - lb
-          - lt
-          - lv
-          - mk
-          - ml
-          - mn
-          - mr
-          - ms
-          - my
-          - nb
-          - ne
-          - nl
-          - nn
-          - os
-          - pa
-          - pl
-          - pt
-          - pt-br
-          - ro
-          - ru
-          - sk
-          - sl
-          - sq
-          - sr
-          - sr-latn
-          - sv
-          - sw
-          - ta
-          - te
-          - tg
-          - th
-          - tk
-          - tr
-          - tt
-          - udm
-          - ug
-          - uk
-          - ur
-          - uz
-          - vi
-          - zh-hans
-          - zh-hant
       tags:
       - schema
       security:
@@ -326,6 +431,33 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/vendedores/{id_vendedor}/clientes/:
+    get:
+      operationId: vendedores_listar_clientes_do_vendedor
+      description: |-
+        Rota exigida pelo PDF: /api/vendedores/{id}/clientes/
+        Lista todos os clientes atendidos pelo vendedor informado.
+      parameters:
+      - in: path
+        name: id_vendedor
+        schema:
+          type: integer
+        required: true
+      tags:
+      - vendedores
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+          description: ''
 components:
   schemas:
     AuthToken:
@@ -344,6 +476,89 @@ components:
       - password
       - token
       - username
+    Cliente:
+      type: object
+      properties:
+        id_cliente:
+          type: string
+          maxLength: 20
+        razao_social:
+          type: string
+          maxLength: 150
+        cnpj_normalizado:
+          type: string
+          maxLength: 14
+        telefone_normalizado:
+          type: string
+          maxLength: 11
+        email:
+          type: string
+          maxLength: 150
+        bairro_normalizado:
+          type: string
+          maxLength: 100
+        cep_normalizado:
+          type: string
+          nullable: true
+          maxLength: 8
+        cidade:
+          type: string
+          maxLength: 50
+        uf:
+          type: string
+          maxLength: 2
+        data_cadastro_normalizado:
+          type: string
+          format: date
+        vendedor_id:
+          type: integer
+      required:
+      - bairro_normalizado
+      - cidade
+      - cnpj_normalizado
+      - data_cadastro_normalizado
+      - email
+      - id_cliente
+      - razao_social
+      - telefone_normalizado
+      - uf
+      - vendedor_id
+    PatchedCliente:
+      type: object
+      properties:
+        id_cliente:
+          type: string
+          maxLength: 20
+        razao_social:
+          type: string
+          maxLength: 150
+        cnpj_normalizado:
+          type: string
+          maxLength: 14
+        telefone_normalizado:
+          type: string
+          maxLength: 11
+        email:
+          type: string
+          maxLength: 150
+        bairro_normalizado:
+          type: string
+          maxLength: 100
+        cep_normalizado:
+          type: string
+          nullable: true
+          maxLength: 8
+        cidade:
+          type: string
+          maxLength: 50
+        uf:
+          type: string
+          maxLength: 2
+        data_cadastro_normalizado:
+          type: string
+          format: date
+        vendedor_id:
+          type: integer
     PatchedVendedor:
       type: object
       properties:
