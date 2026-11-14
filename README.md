@@ -197,6 +197,73 @@ pip install -r requirements.txt
 
 ---
 
+## 🚀 Como Executar o Projeto (ETL, Servidor da API e Testes)
+
+### 1. Como Rodar o Pipeline de ETL (Parte 1)
+Para reprocessar a planilha original (`data/raw/02-clientes_distribuidora_vetor.csv`), aplicar todas as regras de limpeza, consultar o cache de CEP e regerar o banco e as tabelas tratadas:
+```bash
+python -m etl.pipeline
+```
+- **Visualização rápida sem servidor:** Dê 2 cliques no arquivo `data/processed/visualizar_tabelas.html` para ver as 3 tabelas (`vendedor`, `cliente`, `auditoria_etl`) no navegador.
+
+---
+
+### 2. Como Rodar o Servidor da API em Django (Parte 2)
+
+> **💡 Conexão Automática de Banco:**  
+> Por padrão, o Django já abre automaticamente o banco **`data/processed/banco_primora.sqlite3`** gerado pelo ETL (com os 5 vendedores, 47 clientes e 188 logs de auditoria prontos!). Se desejar usar **PostgreSQL**, basta preencher o arquivo `.env` seguindo o exemplo de `api/.env.example` e executar `scripts/carga_postgresql.sql`.
+
+**Passo A — Preparar as tabelas internas do Django (Login/Admin):**
+```bash
+python api/manage.py migrate --fake-initial
+```
+*(O comando `--fake-initial` avisa ao Django para aproveitar as tabelas `vendedor`, `cliente` e `auditoria_etl` que o ETL já criou!)*
+
+**Passo B — (Opcional) Criar um usuário Administrador para entrar no Painel Admin:**
+```bash
+python api/manage.py createsuperuser
+```
+
+**Passo C — Ligar o Servidor da API:**
+```bash
+python api/manage.py runserver
+```
+
+---
+
+### 🌐 3. Rotas Disponíveis para Testar no Navegador (`http://127.0.0.1:8000`)
+
+Com o servidor ligado (`runserver`), acesse qualquer um dos endereços abaixo:
+
+| Rota / Endpoint | O que faz | Permissão |
+| :--- | :--- | :--- |
+| **`/api/docs/`** | **Documentação Interativa Redoc** (manual visual completo da API) | Pública |
+| **`/api/swagger/`** | **Documentação Swagger UI** (permite testar as rotas clicando na tela) | Pública |
+| **`/api/clientes/`** | Lista todos os 47 clientes tratados (`GET`) ou cadastra novo (`POST`) | `GET` Público / `POST` Token |
+| **`/api/clientes/{id}/`** | Detalhes de um cliente específico (ex: `/api/clientes/CLI0001/`) | `GET` Público / Edição Token |
+| **`/api/clientes/bairro/{nome}/`** | Filtra clientes por bairro com ou sem acento (ex: `/api/clientes/bairro/aguas claras/`) | Pública (`GET`) |
+| **`/api/clientes/vendedor/{id}/`** | Lista clientes atendidos por um vendedor (ex: `/api/clientes/vendedor/1/`) | Pública (`GET`) |
+| **`/api/vendedores/`** | Lista os 5 vendedores (`GET`) ou cadastra novo (`POST`) | `GET` Público / `POST` Token |
+| **`/api/vendedores/{id}/clientes/`** | Lista todos os clientes daquele vendedor (ex: `/api/vendedores/1/clientes/`) | Pública (`GET`) |
+| **`/api/auth/token/`** | Envia `username` e `password` via `POST` e recebe o Token de autenticação | Pública (`POST`) |
+| **`/admin/`** | **Painel Administrativo Django** (acesso às 3 tabelas, incluindo **`Auditoria do ETL`**) | Restrito (Login Admin) |
+
+---
+
+### 🧪 4. Como Rodar os 20 Testes Automatizados
+
+Nosso projeto possui **20 testes automatizados** (também executados automaticamente a cada envio pelo **GitHub Actions**):
+
+```bash
+# 1. Rodar os 7 testes do Pipeline ETL (com simulação Mock da API de CEP):
+python -m unittest discover -s tests -v
+
+# 2. Rodar os 13 testes da API Django (8 de Vendedores + 5 de Clientes e Documentação):
+python api/manage.py test vendedores clientes -v 2
+```
+
+---
+
 ## 👥 Integrantes do Grupo
 
 <table align="center">
