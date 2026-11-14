@@ -36,8 +36,8 @@ flowchart TD
         DOCS["📖 Documentação Interativa OpenAPI 3.0<br/>/api/docs/ (Redoc) | /api/swagger/"]
     end
 
-    subgraph C5["🤖 5. Camada de Qualidade e DevOps (CI/CD)"]
-        CI["✅ GitHub Actions (.github/workflows/ci.yml)<br/>Executa 20 Testes Automatizados a cada Push/PR<br/>(7 ETL Mock + 8 Vendedores + 5 Clientes)"]
+    subgraph C5["🤖 5. Camada de Qualidade e Integração Contínua (CI)"]
+        CI["✅ GitHub Actions (.github/workflows/ci.yml)<br/>Executa 20 Testes Automatizados e o Pipeline ETL a cada Push/PR<br/>(7 ETL Mock + 8 Vendedores + 5 Clientes)"]
     end
 
     RAW --> EXT
@@ -93,8 +93,8 @@ As **3 tabelas relacionais** (`vendedor`, `cliente` e `auditoria_etl`) são entr
 - **Governança no Admin (`/admin/`):** As 3 tabelas estão registradas no Django Admin, sendo a tabela `auditoria_etl` **exclusiva do Admin** (não exposta na API pública).
 - **Documentação Interativa (`drf-spectacular`):** Publicada em `/api/docs/` (Redoc) e `/api/swagger/` (Swagger UI).
 
-### Camada 5: Qualidade e Monitoramento Contínuo (`.github/workflows/ci.yml`)
-- Nosso **Bot de Monitoramento no GitHub Actions** executa automaticamente os **20 testes automatizados** (7 do ETL com simulação *Mock* + 8 de Vendedores + 5 de Clientes) e roda o pipeline completo a cada *Push* ou *Pull Request*.
+### Camada 5: Qualidade e Integração Contínua — CI (`.github/workflows/ci.yml`)
+- Nosso **Bot de Monitoramento no GitHub Actions (CI)** executa automaticamente os **20 testes automatizados** (7 do ETL com simulação *Mock* + 8 de Vendedores + 5 de Clientes) e roda o pipeline completo a cada *Push* ou *Pull Request*, deixando a base pronta para futura implantação contínua (CD).
 
 ---
 

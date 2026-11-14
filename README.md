@@ -74,7 +74,7 @@ desafio-primora/
 | `api` | Projeto Django e endpoints da API REST (`vendedores`, `clientes` e autenticação) |
 | `tests` | Testes automatizados das regras de limpeza e dos conflitos de CEP |
 | `scripts` | Script pronto para carregar as tabelas no PostgreSQL |
-| `.github/workflows` | Automação CI/CD (GitHub Actions) que executa os testes do ETL e da API a cada Push/PR |
+| `.github/workflows` | Automação de Integração Contínua (CI - GitHub Actions) que executa os testes do ETL e da API a cada Push/PR |
 
 ---
 
