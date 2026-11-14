@@ -137,12 +137,12 @@ O comando `python -m etl.pipeline` lê a base original e gera os arquivos abaixo
 - [x] **Etapa 5:** Geração das tabelas em SQLite, CSV e script PostgreSQL.
 - [x] **Etapa 6:** Documentação, painel visual e relatório de decisões.
 
-### Parte 2 — API REST em Django (Andamento das Sprints)
+### Parte 2 — API REST em Django (100% Concluída!)
 - [x] Criar o projeto Django base e configurar integração com o banco do ETL (`SQLite` / `PostgreSQL`).
 - [x] Implementar módulo e CRUD de Vendedores (`/api/vendedores/`), autenticação por Token (`/api/auth/token/`), permissão global `IsAuthenticatedOrReadOnly`, registro no Admin e testes automatizados (PR #1 — `@alderiana`).
-- [ ] Implementar Model, Serializer e CRUD de Clientes (`/api/clientes/`) e rotas de filtro por bairro e por vendedor (`@Hefestos27`).
-- [ ] Registrar `Cliente` e `Auditoria` (somente no Django Admin, sem expor `auditoria_etl` na API).
-- [ ] Publicar a documentação interativa OpenAPI, Redoc e Swagger (`drf-spectacular`).
+- [x] Implementar Model, Serializer e CRUD de Clientes (`/api/clientes/`) e rotas de filtro por bairro (`/api/clientes/bairro/{nome}/`) e por vendedor (`/api/clientes/vendedor/{id}/` e `/api/vendedores/{id}/clientes/`) (PR #9 — `@Hefestos27`).
+- [x] Registrar `Vendedor`, `Cliente` e `AuditoriaEtl` no Django Admin (mantendo `auditoria_etl` restrita ao Admin e fora das rotas públicas da API).
+- [x] Publicar a documentação interativa OpenAPI, Redoc (`/api/docs/`) e Swagger (`/api/swagger/`) com `drf-spectacular`.
 
 ---
 
