@@ -87,72 +87,53 @@ flowchart TD
 
 ---
 
-## 📐 2. Diagrama Estrutural em Blocos (ASCII)
+## 📐 2. Diagrama Visual de Sequência Ponta a Ponta (Fluxo de Execução)
 
-```text
-+-----------------------------------------------------------------------------------+
-| 1. CAMADA DE DADOS BRUTOS (Imutável)                                              |
-|    [ data/raw/02-clientes_distribuidora_vetor.csv ] -> 47 Clientes | 5 Vendedores |
-+-----------------------------------------+-----------------------------------------+
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
-| 2. CAMADA DE ENGENHARIA DE DADOS (Pipeline ETL em Python - pasta etl/)            |
-|                                                                                   |
-|  [extract.py] ---> Leitura 100% em TEXTO (str) para proteger zeros                |
-|       |                                                                           |
-|       v                                                                           |
-|  [transform_fields.py] ---> CNPJ (14 dig) | Telefone (DDD+Num) | Data (AAAA-MM-DD)|
-|       |                                                                           |
-|       v                                                                           |
-|  [cep_service.py] <---> [cep_cache.json] (ViaCEP principal / BrasilAPI fallback)  |
-|       |                                                                           |
-|       v                                                                           |
-|  [transform_address.py] --> 4 Bairros Canônicos + Guardrail (CEP vence Texto)     |
-|       |                     (Conflitos corrigidos: CLI0002, CLI0017 e CLI0033)   |
-|       +-------------------> [audit.py] (Gera 188 registros de antes/depois/regra) |
-|       |                                                                           |
-|       v                                                                           |
-|  [load.py / pipeline.py] -> Gera SQLite, Script PostgreSQL, CSVs e Painel HTML    |
-+-----------------------------------------+-----------------------------------------+
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
-| 3. CAMADA DE PERSISTÊNCIA RELACIONAL SQL (banco_primora.sqlite3 & PostgreSQL)     |
-|                                                                                   |
-|  +--------------------+      1:N      +--------------------+      1:N             |
-|  | TABELA: vendedor   | ------------> | TABELA: cliente    | -----------+         |
-|  | PK: id_vendedor    |               | PK: id_cliente     |            |         |
-|  | (5 vendedores)     |               | FK: vendedor_id    |            v         |
-|  +--------------------+               | (47 clientes)      |   +----------------+ |
-|                                       +--------------------+   | auditoria_etl  | |
-|                                                                | PK:id_auditoria| |
-|                                                                | FK:id_cliente  | |
-|                                                                | (188 registros)| |
-|                                                                +----------------+ |
-+-----------------------------------------+------------------------------+----------+
-                                          |                              |
-                                          v                              | (Exclusivo)
-+--------------------------------------------------------------------+   |
-| 4. CAMADA DE APLICAÇÃO E CONSUMO (Django + DRF - pasta api/)       |   |
-|                                                                    |   v
-|  * Rotas Públicas (GET) / Restritas por Token (POST/PUT/DELETE):   | +------------+
-|    - /api/clientes/                  - /api/vendedores/            | | /admin/    |
-|    - /api/clientes/bairro/{nome}/    - /api/vendedores/{id}/clientes| | Django     |
-|    - /api/clientes/vendedor/{id}/    - /api/auth/token/            | | Admin      |
-|  * Documentação Interativa OpenAPI:  - /api/docs/ e /api/swagger/  | +------------+
-+--------------------------------------------------------------------+
-                                          ^
-                                          : (Validação Transversal em Push/PR)
-+-----------------------------------------+-----------------------------------------+
-| 5. CAMADA DE QUALIDADE E INTEGRAÇÃO CONTÍNUA - CI (.github/workflows/ci.yml)      |
-|    GitHub Actions: Executa 20 testes automatizados (7 ETL + 8 Vend + 5 Cli)       |
-+-----------------------------------------------------------------------------------+
+Enquanto o diagrama acima mostra os **blocos da arquitetura**, este segundo diagrama visual mostra a **ordem exata no tempo** em que o dado caminha pelo sistema e como os usuários interagem com a API e o Admin:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Dev as 👩‍💻 Equipe / Pipeline
+    participant CSV as 📄 CSV Bruto (data/raw)
+    participant ETL as ⚙️ Motor ETL (etl/)
+    participant CEP as 🌐 ViaCEP / BrasilAPI + Cache
+    participant DB as 🗄️ Banco SQL (3 Tabelas)
+    participant API as 🚀 API Django + DRF (api/)
+    actor User as 👤 Usuários / Admin
+
+    Dev->>CSV: 1. Executa python -m etl.pipeline
+    CSV->>ETL: 2. Extrai 47 clientes e 5 vendedores como TEXTO (str)
+    ETL->>ETL: 3. Limpa CNPJ (14 dig), Telefone (sem +55) e Datas (AAAA-MM-DD)
+    ETL->>CEP: 4. Consulta CEPs válidos (lê do cep_cache.json ou API)
+    CEP-->>ETL: 5. Retorna bairro validado (Guardrail corrige CLI0002, CLI0017 e CLI0033)
+    ETL->>DB: 6. Salva 5 vendedores, 47 clientes limpos e 188 logs em auditoria_etl
+    User->>API: 7. Consulta pública GET (/api/clientes/, /api/clientes/bairro/{nome}/, /api/docs/)
+    API->>DB: 8. Lê tabelas vendedor e cliente (db_table)
+    DB-->>User: 9. Retorna JSON padronizado (ou escrita CRUD mediante Token em /api/auth/token/)
+    User->>API: 10. Administrador acessa /admin/ (visualiza auditoria_etl restrita)
 ```
 
 ---
 
-## 🧩 3. Especificação Executiva das 5 Camadas
+## 🗂️ 3. Visão em Árvore dos Módulos por Camada
+
+| Camada | Pasta / Arquivo Principal | Papel dentro da Arquitetura |
+| :--- | :--- | :--- |
+| **1. Origem Bruta** | [`data/raw/02-clientes_distribuidora_vetor.csv`](../../data/raw/02-clientes_distribuidora_vetor.csv) | Base original imutável (47 clientes e 5 vendedores). |
+| **2. Extração ETL** | [`etl/extract.py`](../../etl/extract.py) | Carrega o CSV preservando todos os campos como texto (`str`). |
+| **2. Transformação Simples** | [`etl/transform_fields.py`](../../etl/transform_fields.py) | Normaliza CNPJ (14 dígitos), Telefone (10/11 dígitos) e Datas (`AAAA-MM-DD`). |
+| **2. Enriquecimento CEP** | [`etl/cep_service.py`](../../etl/cep_service.py) + [`cep_cache.json`](../../data/processed/cep_cache.json) | Consulta ViaCEP (com *fallback* BrasilAPI) e armazena em cache local. |
+| **2. Bairros e Guardrail** | [`etl/transform_address.py`](../../etl/transform_address.py) | Aplica Dicionário dos 4 bairros do DF e Guardrail de conflito CEP x Bairro. |
+| **2. Auditoria** | [`etl/audit.py`](../../etl/audit.py) | Registra as 188 transformações (`valor_original` ➔ `valor_tratado` ➔ `regra_aplicada`). |
+| **2. Orquestração e Carga** | [`etl/pipeline.py`](../../etl/pipeline.py) + [`etl/load.py`](../../etl/load.py) | Executa o fluxo completo e exporta SQLite, script PostgreSQL, CSVs e HTML. |
+| **3. Banco de Dados SQL** | [`banco_primora.sqlite3`](../../data/processed/banco_primora.sqlite3) + [`carga_postgresql.sql`](../../scripts/carga_postgresql.sql) | Armazena as tabelas `vendedor` (5), `cliente` (47) e `auditoria_etl` (188). |
+| **4. API REST Django** | [`api/vendedores/`](../../api/vendedores/) + [`api/clientes/`](../../api/clientes/) + [`api/config/`](../../api/config/) | Disponibiliza CRUD, filtros, Token Auth, Admin restrito e Redoc (`/api/docs/`). |
+| **5. Qualidade (CI)** | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) + [`tests/`](../../tests/) | Executa automaticamente os 20 testes (7 ETL + 8 Vendedores + 5 Clientes) em Push/PR. |
+
+---
+
+## 🧩 4. Especificação Executiva das 5 Camadas
 
 ### Camada 1 — Dados Brutos (`data/raw/`)
 - **Função:** Preservar a evidência original fornecida pela empresa sem qualquer alteração direta (*imutabilidade do dado bruto*).
@@ -188,7 +169,7 @@ flowchart TD
 
 ---
 
-## 🏆 4. Matriz de Decisões Arquiteturais
+## 🏆 5. Matriz de Decisões Arquiteturais
 
 | Decisão Arquitetural | Problema Resolvido | Justificativa Técnica | Benefício Direto |
 | :--- | :--- | :--- | :--- |
