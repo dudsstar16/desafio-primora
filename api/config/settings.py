@@ -64,7 +64,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Banco de dados
+# Banco de dados (PostgreSQL via .env ou SQLite populado pelo ETL por padrão)
 _db_name = os.getenv('DB_NAME') or os.getenv('POSTGRES_DB')
 
 if _db_name:
@@ -133,4 +133,12 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API Primora — Distribuidora Vetor',
+    'DESCRIPTION': 'Documentação interativa da API REST de Clientes e Vendedores (após tratamento ETL)',
+    'VERSION': '1.0.0',
+    'REDOC_DIST': 'https://cdn.jsdelivr.net/npm/redoc@2.1.5',
 }

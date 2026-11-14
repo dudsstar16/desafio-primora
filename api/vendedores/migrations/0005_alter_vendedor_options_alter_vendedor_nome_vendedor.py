@@ -16,7 +16,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='vendedor',
+            name='id_vendedor',
+            field=models.AutoField(primary_key=True, serialize=False),
+        ),
+        migrations.AlterField(
+            model_name='vendedor',
             name='nome_vendedor',
-            field=models.CharField(max_length=100),
+            field=models.CharField(max_length=100, unique=True),
         ),
     ]
