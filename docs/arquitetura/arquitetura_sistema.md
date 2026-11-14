@@ -1,48 +1,58 @@
 # 🏗️ Arquitetura Ponta a Ponta do Sistema — Desafio Primora (Distribuidora Vetor)
 
-> **Visão Geral em Frases Simples:**  
-> Este documento mostra como o nosso sistema funciona do começo ao fim: desde a leitura da planilha bruta dos 47 clientes, passando pelo motor de limpeza (ETL em Python) e pelo banco de dados relacional, até chegar na API REST em Django e no monitoramento automático de qualidade.
+Documento técnico de arquitetura do sistema integrado de **Engenharia de Dados (Pipeline ETL em Python)** e **Backend (API REST em Django / DRF)** desenvolvido para a Distribuidora Vetor.
 
 ---
 
-## 🗺️ 1. Diagrama Visual da Arquitetura Completa
+## 🗺️ 1. Diagrama Interativo da Arquitetura (Mermaid)
+
+O fluxo principal percorre as camadas de dados (**Origem → ETL Python → Persistência SQL → Aplicação Django/DRF → Consumidores**), enquanto a camada de **Qualidade e Integração Contínua (CI)** atua transversalmente validando o código.
 
 ```mermaid
 flowchart TD
-    subgraph C1["📂 1. Camada de Origem (Dado Bruto Imutável)"]
-        RAW["📄 02-clientes_distribuidora_vetor.csv<br/>(47 Clientes e 5 Vendedores com Inconsistências)"]
+    subgraph C1["📂 1. Camada de Dados Brutos (Origem Imutável)"]
+        RAW["📄 data/raw/02-clientes_distribuidora_vetor.csv<br/>47 clientes | 5 vendedores | 20 grafias de bairros<br/>CEPs ausentes/00000-000 | 3 conflitos CEP x Bairro"]
     end
 
-    subgraph C2["⚙️ 2. Camada de Engenharia de Dados (Pipeline ETL em Python - etl/)"]
-        EXT["📥 extract.py<br/>Leitura segura como TEXTO (str)<br/>(Protege zeros em CNPJ, Telefone e CEP)"]
-        TF["🧹 transform_fields.py<br/>Limpeza de CNPJ (14 dígitos),<br/>Telefone (sem +55) e Datas (AAAA-MM-DD)"]
-        CEP["🌐 cep_service.py<br/>Consulta ViaCEP / BrasilAPI<br/>+ Cache Local (cep_cache.json)"]
-        TA["🛡️ transform_address.py<br/>Dicionário dos 4 Bairros do DF<br/>+ Guardrail (CEP Oficial vence Texto)"]
-        AUD["📝 audit.py<br/>AuditLogger (Rastreabilidade)<br/>(188 registros: Antes -> Depois -> Regra)"]
-        LOAD["💾 load.py & pipeline.py<br/>Orquestrador de Carga Multi-Formato"]
+    subgraph C2["⚙️ 2. Camada de Engenharia de Dados (Pipeline ETL Python - etl/)"]
+        EXT["📥 extract.py<br/>Extração textual segura (str)<br/>Preserva zeros à esquerda/direita"]
+        TF["🧹 transform_fields.py<br/>CNPJ (14 dígitos texto)<br/>Telefone (10/11 dígitos sem +55)<br/>Datas (ISO AAAA-MM-DD)"]
+        CEP["🌐 cep_service.py<br/>Consulta ViaCEP (principal)<br/>Fallback automático BrasilAPI"]
+        CACHE[("⚡ cep_cache.json<br/>Cache Local de CEPs")]
+        TA["🛡️ transform_address.py<br/>Dicionário Canônico (4 bairros do DF)<br/>+ Guardrail de Conflito (CEP oficial vence texto)<br/>Corrigidos: CLI0002, CLI0017 e CLI0033"]
+        AUD["📝 audit.py<br/>AuditLogger (188 registros)<br/>valor_original -> valor_tratado -> regra_aplicada"]
+        LOAD["💾 load.py & pipeline.py<br/>Carga simultânea multi-formato"]
     end
 
     subgraph C3["🗄️ 3. Camada de Persistência Relacional e Artefatos"]
-        DB_SQLITE[("📦 banco_primora.sqlite3<br/>(3 Tabelas Prontas no Repositório)")]
-        DB_PG[("🐘 PostgreSQL Local<br/>(scripts/carga_postgresql.sql)")]
-        CSVS["📊 Planilhas Limpas (.csv)<br/>+ Painel Visual (visualizar_tabelas.html)"]
+        T_VEND[("Tabela: vendedor<br/>PK: id_vendedor<br/>(5 registros)")]
+        T_CLI[("Tabela: cliente<br/>PK: id_cliente | FK: vendedor_id<br/>(47 registros tratados)")]
+        T_AUD[("Tabela: auditoria_etl<br/>PK: id_auditoria | FK: id_cliente<br/>(188 registros de tratamento)")]
+        ARTEFATOS["📊 Artefatos Exportados<br/>banco_primora.sqlite3 | carga_postgresql.sql<br/>CSVs limpos | visualizar_tabelas.html"]
     end
 
-    subgraph C4["🚀 4. Camada de Aplicação e Consumo (API REST em Django - api/)"]
-        MODELS["🧱 Models Django (managed=True)<br/>db_table: vendedor | cliente | auditoria_etl"]
-        AUTH["🔐 Segurança e Controle de Acesso<br/>Token Auth (/api/auth/token/)<br/>+ IsAuthenticatedOrReadOnly"]
-        ENDPOINTS["🌐 Rotas Públicas e Autenticadas<br/>/api/clientes/ | /api/vendedores/<br/>/api/clientes/bairro/{nome}/ (com/sem acento)<br/>/api/vendedores/{id}/clientes/"]
-        ADMIN["🔒 Django Admin (/admin/)<br/>Vendedor, Cliente e AuditoriaEtl<br/>(Auditoria restrita apenas ao Admin!)"]
-        DOCS["📖 Documentação Interativa OpenAPI 3.0<br/>/api/docs/ (Redoc) | /api/swagger/"]
+    subgraph C4["🚀 4. Camada de Aplicação e Consumo (Django + DRF - api/)"]
+        ORM["🧱 Models Django (managed=True)<br/>Mapeamento db_table: vendedor, cliente, auditoria_etl"]
+        AUTH["🔐 Autenticação e Controle de Acesso<br/>Token Auth (/api/auth/token/)<br/>Permissão Global: IsAuthenticatedOrReadOnly"]
+        API_ROTAS["🌐 Endpoints da API REST<br/>/api/clientes/ | /api/vendedores/<br/>/api/clientes/bairro/{nome}/<br/>/api/clientes/vendedor/{id}/<br/>/api/vendedores/{id}/clientes/"]
+        ADMIN["🔒 Django Admin (/admin/)<br/>Gerencia Vendedor e Cliente<br/>Exibe auditoria_etl (Restrita ao Admin)"]
+        OPENAPI["📖 Documentação OpenAPI 3.0 (drf-spectacular)<br/>/api/docs/ (Redoc) | /api/swagger/ (Swagger UI)"]
     end
 
-    subgraph C5["🤖 5. Camada de Qualidade e Integração Contínua (CI)"]
-        CI["✅ GitHub Actions (.github/workflows/ci.yml)<br/>Executa 20 Testes Automatizados e o Pipeline ETL a cada Push/PR<br/>(7 ETL Mock + 8 Vendedores + 5 Clientes)"]
+    subgraph C_USERS["👥 Perfis de Consumo"]
+        U_PUB["👤 Visitante Não Autenticado<br/>Apenas Leitura (GET)"]
+        U_AUTH["🔑 Usuário Autenticado (Token)<br/>CRUD Completo (GET, POST, PUT, PATCH, DELETE)"]
+        U_ADM["🛡️ Administrador<br/>Painel Django Admin + Auditoria"]
+    end
+
+    subgraph C5["🤖 5. Camada Transversal de Qualidade e Integração Contínua (CI)"]
+        CI["✅ GitHub Actions (.github/workflows/ci.yml)<br/>Valida Push e Pull Requests automaticamente<br/>20 Testes (7 ETL Mock + 8 Vendedores + 5 Clientes) + Execução do Pipeline"]
     end
 
     RAW --> EXT
     EXT --> TF
     TF --> CEP
+    CEP <--> CACHE
     CEP --> TA
     TF -.-> AUD
     CEP -.-> AUD
@@ -50,60 +60,141 @@ flowchart TD
     TA --> LOAD
     AUD --> LOAD
 
-    LOAD --> DB_SQLITE
-    LOAD --> DB_PG
-    LOAD --> CSVS
+    LOAD --> T_VEND
+    LOAD --> T_CLI
+    LOAD --> T_AUD
+    LOAD --> ARTEFATOS
+    T_VEND --> T_CLI
+    T_CLI --> T_AUD
 
-    DB_SQLITE --> MODELS
-    DB_PG --> MODELS
-    MODELS --> AUTH
-    AUTH --> ENDPOINTS
-    MODELS --> ADMIN
-    ENDPOINTS --> DOCS
-    CI -. "Vigia todo o código" .-> C2
-    CI -. "Vigia toda a API" .-> C4
+    T_VEND --> ORM
+    T_CLI --> ORM
+    T_AUD --> ORM
+
+    ORM --> AUTH
+    AUTH --> API_ROTAS
+    ORM --> ADMIN
+    API_ROTAS --> OPENAPI
+
+    API_ROTAS --> U_PUB
+    API_ROTAS --> U_AUTH
+    OPENAPI --> U_PUB
+    ADMIN --> U_ADM
+
+    CI -. "Testa e valida ETL (7 testes + pipeline)" .-> C2
+    CI -. "Testa e valida API (13 testes DRF)" .-> C4
 ```
 
 ---
 
-## 🧩 2. Explicação das 5 Camadas da Arquitetura
+## 📐 2. Diagrama Estrutural em Blocos (ASCII)
 
-### Camada 1: Origem dos Dados (`data/raw/`)
-- Guarda o arquivo original `02-clientes_distribuidora_vetor.csv` **intocado**.
-- Contém os problemas reais simulados pelo desafio: 20 grafias diferentes de bairros, CEPs vazios ou `00000-000`, 3 conflitos entre bairro e CEP, além de formatos mistos de CNPJ, telefone e datas.
-
-### Camada 2: Pipeline ETL em Python (`etl/`)
-Dividido em módulos independentes e acionado por um único comando (`python -m etl.pipeline`):
-1. **Extração (`extract.py`):** Carrega todos os campos como texto (`str`) para nunca perder zeros à esquerda ou à direita.
-2. **Transformação de Campos (`transform_fields.py`):** Padroniza CNPJ (14 dígitos), Telefone (10/11 dígitos sem `+55`) e Datas (`AAAA-MM-DD`).
-3. **Enriquecimento de CEP (`cep_service.py`):** Consulta a API oficial dos Correios (**ViaCEP** com *fallback* para **BrasilAPI**) e salva as respostas no **Cache Local (`cep_cache.json`)**, garantindo execução instantânea e funcionamento mesmo sem internet.
-4. **Padronização de Bairros e Guardrail (`transform_address.py`):** Une todas as variações nos **4 bairros canônicos do DF** (`Águas Claras`, `Taguatinga`, `Vicente Pires`, `Guará`) e aplica o **Guardrail de Conflito**: quando o CEP é válido na base oficial, o bairro do CEP prevalece sobre erros de digitação.
-5. **Auditoria (`audit.py`):** Registra cada uma das **188 transformações** realizadas (`id_cliente`, `campo_afetado`, `valor_original`, `valor_tratado`, `regra_aplicada`).
-
-### Camada 3: Persistência Relacional (`data/processed/` e `scripts/`)
-As **3 tabelas relacionais** (`vendedor`, `cliente` e `auditoria_etl`) são entregues simultaneamente em:
-- **Banco SQLite pronto (`banco_primora.sqlite3`):** Permite que a API funcione imediatamente após clonar o repositório.
-- **Script Oficial PostgreSQL (`scripts/carga_postgresql.sql`):** Cria e popula as 3 tabelas em 1 segundo no PostgreSQL local.
-- **Planilhas CSV e Painel Visual HTML (`visualizar_tabelas.html`):** Permite inspecionar os dados direto no navegador ou no Excel.
-
-### Camada 4: API REST em Django (`api/`)
-- **Conexão Híbrida (`settings.py`):** Conecta ao PostgreSQL se configurado no `.env`, ou usa automaticamente o `banco_primora.sqlite3` do ETL.
-- **Endpoints de Negócio:** CRUD completo de Clientes e Vendedores + rotas de relacionamento por bairro (`/api/clientes/bairro/{nome}/` integrada ao normalizador do ETL) e por vendedor (`/api/clientes/vendedor/{id}/` e `/api/vendedores/{id}/clientes/`).
-- **Segurança (`IsAuthenticatedOrReadOnly` + Token):** Visitantes não logados só podem consultar (`GET`); usuários autenticados via Token (`/api/auth/token/`) realizam alterações (`POST`, `PUT`, `PATCH`, `DELETE`).
-- **Governança no Admin (`/admin/`):** As 3 tabelas estão registradas no Django Admin, sendo a tabela `auditoria_etl` **exclusiva do Admin** (não exposta na API pública).
-- **Documentação Interativa (`drf-spectacular`):** Publicada em `/api/docs/` (Redoc) e `/api/swagger/` (Swagger UI).
-
-### Camada 5: Qualidade e Integração Contínua — CI (`.github/workflows/ci.yml`)
-- Nosso **Bot de Monitoramento no GitHub Actions (CI)** executa automaticamente os **20 testes automatizados** (7 do ETL com simulação *Mock* + 8 de Vendedores + 5 de Clientes) e roda o pipeline completo a cada *Push* ou *Pull Request*, deixando a base pronta para futura implantação contínua (CD).
+```text
++-----------------------------------------------------------------------------------+
+| 1. CAMADA DE DADOS BRUTOS (Imutável)                                              |
+|    [ data/raw/02-clientes_distribuidora_vetor.csv ] -> 47 Clientes | 5 Vendedores |
++-----------------------------------------+-----------------------------------------+
+                                          |
+                                          v
++-----------------------------------------------------------------------------------+
+| 2. CAMADA DE ENGENHARIA DE DADOS (Pipeline ETL em Python - pasta etl/)            |
+|                                                                                   |
+|  [extract.py] ---> Leitura 100% em TEXTO (str) para proteger zeros                |
+|       |                                                                           |
+|       v                                                                           |
+|  [transform_fields.py] ---> CNPJ (14 dig) | Telefone (DDD+Num) | Data (AAAA-MM-DD)|
+|       |                                                                           |
+|       v                                                                           |
+|  [cep_service.py] <---> [cep_cache.json] (ViaCEP principal / BrasilAPI fallback)  |
+|       |                                                                           |
+|       v                                                                           |
+|  [transform_address.py] --> 4 Bairros Canônicos + Guardrail (CEP vence Texto)     |
+|       |                     (Conflitos corrigidos: CLI0002, CLI0017 e CLI0033)   |
+|       +-------------------> [audit.py] (Gera 188 registros de antes/depois/regra) |
+|       |                                                                           |
+|       v                                                                           |
+|  [load.py / pipeline.py] -> Gera SQLite, Script PostgreSQL, CSVs e Painel HTML    |
++-----------------------------------------+-----------------------------------------+
+                                          |
+                                          v
++-----------------------------------------------------------------------------------+
+| 3. CAMADA DE PERSISTÊNCIA RELACIONAL SQL (banco_primora.sqlite3 & PostgreSQL)     |
+|                                                                                   |
+|  +--------------------+      1:N      +--------------------+      1:N             |
+|  | TABELA: vendedor   | ------------> | TABELA: cliente    | -----------+         |
+|  | PK: id_vendedor    |               | PK: id_cliente     |            |         |
+|  | (5 vendedores)     |               | FK: vendedor_id    |            v         |
+|  +--------------------+               | (47 clientes)      |   +----------------+ |
+|                                       +--------------------+   | auditoria_etl  | |
+|                                                                | PK:id_auditoria| |
+|                                                                | FK:id_cliente  | |
+|                                                                | (188 registros)| |
+|                                                                +----------------+ |
++-----------------------------------------+------------------------------+----------+
+                                          |                              |
+                                          v                              | (Exclusivo)
++--------------------------------------------------------------------+   |
+| 4. CAMADA DE APLICAÇÃO E CONSUMO (Django + DRF - pasta api/)       |   |
+|                                                                    |   v
+|  * Rotas Públicas (GET) / Restritas por Token (POST/PUT/DELETE):   | +------------+
+|    - /api/clientes/                  - /api/vendedores/            | | /admin/    |
+|    - /api/clientes/bairro/{nome}/    - /api/vendedores/{id}/clientes| | Django     |
+|    - /api/clientes/vendedor/{id}/    - /api/auth/token/            | | Admin      |
+|  * Documentação Interativa OpenAPI:  - /api/docs/ e /api/swagger/  | +------------+
++--------------------------------------------------------------------+
+                                          ^
+                                          : (Validação Transversal em Push/PR)
++-----------------------------------------+-----------------------------------------+
+| 5. CAMADA DE QUALIDADE E INTEGRAÇÃO CONTÍNUA - CI (.github/workflows/ci.yml)      |
+|    GitHub Actions: Executa 20 testes automatizados (7 ETL + 8 Vend + 5 Cli)       |
++-----------------------------------------------------------------------------------+
+```
 
 ---
 
-## 🏆 3. Resumo das Principais Decisões Arquiteturais
+## 🧩 3. Especificação Executiva das 5 Camadas
 
-| Decisão Técnica | Onde foi aplicada | Por que escolhemos assim? (Benefício) |
-| :--- | :--- | :--- |
-| **CNPJ, Telefone e CEP como `VARCHAR` (Texto)** | `etl/extract.py`, `etl/transform_fields.py`, `models.py` | Evita que o banco de dados ou o Excel apaguem zeros à esquerda (ex: CNPJ `04...`) ou à direita (ex: Telefone `...00`). |
-| **Cache Local de CEP (`cep_cache.json`)** | `etl/cep_service.py` | Evita consultar o mesmo CEP várias vezes na internet, deixando o ETL instantâneo e resistente a quedas de rede. |
-| **Guardrail: CEP Oficial Vence Texto** | `etl/transform_address.py` | Corrige erros humanos de digitação no cadastro (`CLI0002`, `CLI0017`, `CLI0033`) usando a base oficial dos Correios, registrando a troca na auditoria. |
-| **Reuso do Normalizador do ETL na API** | `api/clientes/views.py` | Permite que a rota `/api/clientes/bairro/{nome}/` encontre clientes mesmo quando o usuário pesquisa sem acento (`aguas claras`, `guara ii`). |
-| **Isolamento da Tabela `auditoria_etl`** | `api/clientes/admin.py` | Cumpre a regra de governança do desafio: os logs de auditoria ficam visíveis apenas para administradores no Django Admin. |
+### Camada 1 — Dados Brutos (`data/raw/`)
+- **Função:** Preservar a evidência original fornecida pela empresa sem qualquer alteração direta (*imutabilidade do dado bruto*).
+- **Entrada:** Arquivo `02-clientes_distribuidora_vetor.csv` com 47 registros de clientes e 5 vendedores.
+- **Resultado:** Base de origem auditável contendo as inconsistências reais do desafio (20 grafias de bairros, CEPs vazios ou `00000-000`, 3 conflitos entre bairro e CEP, máscaras mistas de CNPJ/telefone e datas em múltiplos idiomas).
+
+### Camada 2 — Engenharia de Dados / Pipeline ETL (`etl/`)
+- **Função:** Extrair, limpar, padronizar, enriquecer geograficamente via API de CEP e auditar cada modificação realizada.
+- **Entrada:** Os 47 registros brutos lidos como texto (`str`) pelo módulo `extract.py`.
+- **Resultado:**
+  - Campos padronizados (`cnpj_normalizado` com 14 dígitos, `telefone_normalizado` com 10/11 dígitos sem `+55`, `data_cadastro_normalizado` em `AAAA-MM-DD`).
+  - Bairros consolidados nos **4 nomes canônicos do DF** (`Águas Claras`: 21, `Taguatinga`: 13, `Vicente Pires`: 6, `Guará`: 6) e `Não Informado`: 1 (`CLI0047`).
+  - **3 conflitos reais (`CLI0002`, `CLI0017`, `CLI0033`)** corrigidos pelo Guardrail de CEP oficial e **188 registros de auditoria** gerados.
+
+### Camada 3 — Persistência Relacional SQL (`data/processed/` e `scripts/`)
+- **Função:** Garantir integridade relacional, chaves primárias/estrangeiras e disponibilidade imediata para a aplicação web e análises.
+- **Entrada:** Tabelas em memória processadas pelo orquestrador `etl/pipeline.py`.
+- **Resultado:** 3 tabelas relacionais (`vendedor`, `cliente`, `auditoria_etl`) persistidas em banco SQLite (`banco_primora.sqlite3`), script SQL transacional para PostgreSQL (`scripts/carga_postgresql.sql`), planilhas CSV limpas e painel visual HTML (`visualizar_tabelas.html`).
+
+### Camada 4 — Aplicação e Consumo via API REST (`api/`)
+- **Função:** Disponibilizar consultas públicas, operações de manutenção autenticadas (CRUD), administração segura e documentação interativa.
+- **Entrada:** Conexão direta às tabelas do ETL via Django ORM (`db_table`) e requisições HTTP dos usuários.
+- **Resultado:**
+  - Endpoints RESTful completos (`/api/clientes/`, `/api/vendedores/` e rotas de relacionamento por bairro e vendedor).
+  - Autenticação via Token (`/api/auth/token/`) e controle de acesso `IsAuthenticatedOrReadOnly`.
+  - Tabela `auditoria_etl` isolada exclusivamente no Django Admin (`/admin/`).
+  - Documentação OpenAPI 3.0 gerada com `drf-spectacular` em `/api/docs/` (Redoc) e `/api/swagger/` (Swagger UI).
+
+### Camada 5 — Qualidade e Integração Contínua / CI (`.github/workflows/ci.yml`)
+- **Função:** Impedir regressões e validar automaticamente tanto o pipeline de dados quanto a API REST a cada alteração enviada ao repositório.
+- **Entrada:** Eventos de `push` e `pull_request` monitorados pelo GitHub Actions.
+- **Resultado:** Execução automatizada de **20 testes** (**7 de ETL** com simulação *Mock* da API de CEP + **8 de Vendedores** + **5 de Clientes**) e validação da execução completa do pipeline ETL, compondo uma estrutura sólida de **Integração Contínua (CI)** pronta para evoluir a **CI/CD**.
+
+---
+
+## 🏆 4. Matriz de Decisões Arquiteturais
+
+| Decisão Arquitetural | Problema Resolvido | Justificativa Técnica | Benefício Direto |
+| :--- | :--- | :--- | :--- |
+| **Cache Local de CEP (`cep_cache.json`) com ViaCEP + Fallback BrasilAPI** | Lentidão em chamadas HTTP repetidas e risco de indisponibilidade de rede ou queda de API externa. | Consultar a internet para o mesmo CEP repetidamente degrada o tempo de resposta e cria ponto único de falha. | Execução instantânea em milissegundos, tolerância a falhas com duas APIs públicas e operação *offline*. |
+| **Guardrail de Conflito: CEP Oficial Vence Texto Digitado** | Divergência entre o bairro digitado livremente pelo vendedor e o CEP real cadastrado (`CLI0002`, `CLI0017`, `CLI0033`). | O código postal validado na base oficial dos Correios é uma referência geográfica determinística e auditável, superior ao texto livre sujeito a erro humano. | Elimina distorções nos relatórios regionais e mantém transparência total ao gravar a substituição em `auditoria_etl`. |
+| **CNPJ, Telefone e CEP como Texto (`VARCHAR` / `str`)** | Perda de zeros à esquerda (ex: CNPJ `04...` em `CLI0031`) ou à direita (ex: Telefone `...00` em `CLI0001`) quando tratados como tipos numéricos. | Identificadores cadastrais não sofrem operações aritméticas; tipos inteiros removem zeros significativos. | Preservação de 100% dos dígitos originais tanto no banco SQL quanto nas exportações CSV e JSON. |
+| **Reuso do Normalizador do ETL na Rota da API (`/api/clientes/bairro/{nome}/`)** | Usuários da API podem buscar bairros sem acentuação ou com grafias variadas na URL (ex: `aguas claras`, `guara ii`). | Acoplar a função `canonicalize_neighborhood_name` do ETL na `ClienteViewSet` unifica a regra de negócio entre engenharia de dados e backend. | Experiência de busca flexível e consistente, retornando os clientes corretos independentemente de acentos ou caixa. |
+| **Isolamento de `auditoria_etl` no Django Admin** | Necessidade de auditar transformações sem expor histórico bruto de correções na API pública. | Cumpre o requisito de governança do projeto registrando o model `AuditoriaEtl` apenas em `admin.py` com campos `readonly_fields`. | Segurança da informação e rastreabilidade administrativa completa em `/admin/`. |
+| **Integração Contínua (CI) no GitHub Actions** | Risco de que edições paralelas da equipe quebrem regras do ETL ou rotas da API antes do *merge*. | Um workflow automatizado executando os 20 testes e o pipeline a cada Push/PR garante qualidade contínua sem intervenção manual. | Confiabilidade comprovada por selo verde no repositório e base pronta para futura implantação contínua (CD). |
