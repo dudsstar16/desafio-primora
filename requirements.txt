@@ -31,6 +31,10 @@ django-cors-headers>=4.3.0
 # Python Dotenv: lê variáveis de configuração de um arquivo .env (senhas, portas, etc.).
 python-dotenv>=1.0.1
 
+# --- Produção / Render ---
+gunicorn>=23.0.0
+whitenoise[brotli]>=6.8.0
+
 # --- Testes Automatizados ---
 # Pytest: ferramenta para rodar testes automáticos no código.
 pytest>=8.0.0
