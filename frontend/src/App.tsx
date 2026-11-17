@@ -10,6 +10,10 @@ import {
 } from 'lucide-react'
 import { loadPresentationData } from './data'
 import type { Client } from './types'
+import Pipeline from './Pipeline'
+import Decision from './Decision'
+import Architecture from './Architecture'
+import ApiDemo from './ApiDemo'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -158,30 +162,8 @@ function App() {
         <div className="hero-foot"><span>Distribuidora Vetor · Brasília/DF</span><span>Role para acompanhar o dado ↓</span></div>
       </section>
 
-      <section id="caminho" className="chapter cream-section pipeline-section">
-        <header className="section-heading reveal"><div className="eyebrow"><span>02</span> O caminho</div><h2>O dado não é limpo.<br /><em>Ele atravessa decisões.</em></h2><p>Clique em cada estação para entender o que acontece — e por quê.</p></header>
-        <div className="pipeline-layout reveal">
-          <div className="pipeline-track" aria-label="Etapas do pipeline ETL">
-            {pipeline.map((step, index) => <button key={step.id} className={selectedStep.id === step.id ? 'pipeline-step active' : 'pipeline-step'} onClick={() => setSelectedStep(step)} aria-pressed={selectedStep.id === step.id}><span>{String(index + 1).padStart(2, '0')}</span><i /><strong>{step.label}</strong></button>)}
-            <div className="moving-particle" aria-hidden="true" />
-          </div>
-          <TiltCard className="step-detail"><small>{selectedStep.file}</small><h3>{selectedStep.label}</h3><p>{selectedStep.description}</p><div className="code-example"><FileJson /><span>{selectedStep.example}</span></div><div className="step-index">{String(pipeline.findIndex((item) => item.id === selectedStep.id) + 1).padStart(2, '0')}</div></TiltCard>
-        </div>
-      </section>
-
-      <section id="decisao" className="chapter decision-section dark-section">
-        <header className="section-heading reveal"><div className="eyebrow"><span>03</span> A decisão</div><h2>Quando o CEP<br /><em>contradiz o texto.</em></h2><p>O sistema não escolhe por intuição. Ele aplica a mesma regra, sempre.</p></header>
-        <div className="case-tabs reveal">{cases.map((item, index) => <button key={item.id} className={selectedCase === index ? 'active' : ''} onClick={() => setSelectedCase(index)}>{item.id}</button>)}</div>
-        <div className="comparison reveal">
-          <div className="comparison-visual" style={{ '--compare': `${compare}%` } as React.CSSProperties}>
-            <div className="compare-before"><small>Texto digitado</small><strong>{cases[selectedCase].before}</strong><span>Entrada humana</span></div>
-            <div className="compare-after"><small>CEP validado · {cases[selectedCase].cep}</small><strong>{cases[selectedCase].after}</strong><span>Fonte de referência</span></div>
-            <div className="compare-line"><ShieldCheck /></div>
-            <input aria-label="Comparar antes e depois" type="range" min="18" max="82" value={compare} onChange={(event) => setCompare(Number(event.target.value))} />
-          </div>
-          <div className="case-story"><span>GUARDRAIL ATIVO</span><h3>{cases[selectedCase].title}</h3><p>{cases[selectedCase].note}</p><div className="rule"><Check /> CEP oficial vence o texto livre</div></div>
-        </div>
-      </section>
+      <Pipeline />
+      <Decision />
 
       <section id="prova" className="chapter proof-section">
         <div className="proof-number reveal"><span><CountUp value={metrics.auditorias} /></span><div><div className="eyebrow"><span>04</span> A prova</div><h2>mudanças.<br />Nenhuma<br /><em>no escuro.</em></h2></div></div>
@@ -204,11 +186,8 @@ function App() {
 
       <section id="sistema" className="chapter system-section dark-section">
         <header className="section-heading reveal"><div className="eyebrow"><span>06</span> O sistema vivo</div><h2>Um dado limpo<br /><em>precisa circular.</em></h2><p>Arraste, aproxime e explore a arquitetura ponta a ponta.</p></header>
-        <div className="architecture reveal"><ReactFlow nodes={architectureNodes} edges={architectureEdges} nodeTypes={{ story: StoryNode }} fitView minZoom={.7} maxZoom={1.3} nodesDraggable={false} nodesConnectable={false} proOptions={{ hideAttribution: true }}><Background color="#9CAF88" gap={28} size={1} /><Controls showInteractive={false} /></ReactFlow></div>
-        <div className="api-demo reveal">
-          <div className="api-copy"><span>GET · PÚBLICO · SOMENTE LEITURA</span><h3>A API responde.<br />A interface traduz.</h3><p>A mesma base que alimenta o dashboard pode ser consultada por qualquer consumidor autorizado.</p><button onClick={runApiDemo} disabled={apiDemo === 'loading'}>{apiDemo === 'loading' ? 'Consultando…' : 'Executar chamada'}<ArrowRight /></button></div>
-          <div className={`terminal ${apiDemo}`}><header><i /><i /><i /><span>GET /api/clientes/bairro/aguas claras/</span></header><pre>{apiDemo === 'idle' ? '// Clique para consultar a API' : apiDemo === 'loading' ? '> conectando ao Django REST…' : JSON.stringify((data?.clients || []).filter((item) => item.bairro_normalizado === 'Águas Claras').slice(0, 2), null, 2)}</pre></div>
-        </div>
+        <Architecture />
+        <ApiDemo />
       </section>
 
       <section id="confianca" className="chapter trust-section">
