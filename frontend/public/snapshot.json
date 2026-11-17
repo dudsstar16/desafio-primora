@@ -1,0 +1,453 @@
+{
+  "generatedAt": "2026-11-17T11:38:55.167Z",
+  "clients": [
+    {
+      "id_cliente": "CLI0001",
+      "razao_social": "Mercadinho Boa Vista",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0002",
+      "razao_social": "Comercial São Judas",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0003",
+      "razao_social": "Armarinhos Silva & Cia",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0004",
+      "razao_social": "Empório Vale Verde",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0005",
+      "razao_social": "Mercearia Dois Irmãos",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0006",
+      "razao_social": "Casa das Tintas Ipê",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0007",
+      "razao_social": "Distribuidora Popular Centro-Oeste",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0008",
+      "razao_social": "Bazar Estrela Dourada",
+      "bairro_normalizado": "Vicente Pires",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    },
+    {
+      "id_cliente": "CLI0009",
+      "razao_social": "Supermercado Nova Aliança",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    },
+    {
+      "id_cliente": "CLI0010",
+      "razao_social": "Papelaria Horizonte",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0011",
+      "razao_social": "Ferragens União",
+      "bairro_normalizado": "Vicente Pires",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0012",
+      "razao_social": "Mercado Cantinho do Sabor",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0013",
+      "razao_social": "Loja Fatima Confecções",
+      "bairro_normalizado": "Guará",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0014",
+      "razao_social": "Depósito São Roque",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 5
+    },
+    {
+      "id_cliente": "CLI0015",
+      "razao_social": "Comercial Rio Bonito",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0016",
+      "razao_social": "Minimercado Vitória Régia",
+      "bairro_normalizado": "Vicente Pires",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0017",
+      "razao_social": "Casa de Carnes Ouro Fino",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0018",
+      "razao_social": "Armazém Planalto",
+      "bairro_normalizado": "Vicente Pires",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0019",
+      "razao_social": "Bazar Flor de Lis",
+      "bairro_normalizado": "Guará",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0020",
+      "razao_social": "Mercado Bom Preço DF",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0021",
+      "razao_social": "Distribuidora Cerrado Norte",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0022",
+      "razao_social": "Comercial Águas do Sul",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0023",
+      "razao_social": "Padaria Trigo Dourado",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    },
+    {
+      "id_cliente": "CLI0024",
+      "razao_social": "Loja de Utilidades Girassol",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0025",
+      "razao_social": "Empório do Produtor",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    },
+    {
+      "id_cliente": "CLI0026",
+      "razao_social": "Mercadinho Recanto Feliz",
+      "bairro_normalizado": "Vicente Pires",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0027",
+      "razao_social": "Casa da Limpeza Total",
+      "bairro_normalizado": "Guará",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0028",
+      "razao_social": "Comercial Serra Azul",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    },
+    {
+      "id_cliente": "CLI0029",
+      "razao_social": "Armazém Fazendinha",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0030",
+      "razao_social": "Bazar Nova Esperança",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0031",
+      "razao_social": "Distribuidora Vale do Alvorada",
+      "bairro_normalizado": "Guará",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0032",
+      "razao_social": "Mercearia Central DF",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 5
+    },
+    {
+      "id_cliente": "CLI0033",
+      "razao_social": "Loja Bom Retiro",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0034",
+      "razao_social": "Comercial Duas Palmeiras",
+      "bairro_normalizado": "Guará",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0035",
+      "razao_social": "Casa das Bebidas Real",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0036",
+      "razao_social": "Mercadinho Nossa Senhora",
+      "bairro_normalizado": "Taguatinga",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 5
+    },
+    {
+      "id_cliente": "CLI0037",
+      "razao_social": "Armarinhos Ponto Certo",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0038",
+      "razao_social": "Empório Chão Vermelho",
+      "bairro_normalizado": "Vicente Pires",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    },
+    {
+      "id_cliente": "CLI0039",
+      "razao_social": "Distribuidora Horizonte Azul",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    },
+    {
+      "id_cliente": "CLI0040",
+      "razao_social": "Casa de Materiais Rocha",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    },
+    {
+      "id_cliente": "CLI0041",
+      "razao_social": "Mercado Popular Central",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0042",
+      "razao_social": "Comercial Passo Firme",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0043",
+      "razao_social": "Bazar Sol Nascente",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 3
+    },
+    {
+      "id_cliente": "CLI0044",
+      "razao_social": "Depósito Cerrado Sul",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0045",
+      "razao_social": "Loja Multi Utilidades",
+      "bairro_normalizado": "Águas Claras",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 1
+    },
+    {
+      "id_cliente": "CLI0046",
+      "razao_social": "Armazém Boa Colheita",
+      "bairro_normalizado": "Guará",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 2
+    },
+    {
+      "id_cliente": "CLI0047",
+      "razao_social": "Mercadinho Sem Endereço Completo",
+      "bairro_normalizado": "Não Informado",
+      "cidade": "Brasília",
+      "uf": "DF",
+      "vendedor_id": 4
+    }
+  ],
+  "sellers": [
+    {
+      "id_vendedor": 1,
+      "nome_vendedor": "Bruno Almeida"
+    },
+    {
+      "id_vendedor": 2,
+      "nome_vendedor": "Camila Torres"
+    },
+    {
+      "id_vendedor": 3,
+      "nome_vendedor": "Diego Martins"
+    },
+    {
+      "id_vendedor": 4,
+      "nome_vendedor": "Juliana Reis"
+    },
+    {
+      "id_vendedor": 5,
+      "nome_vendedor": "Rafael Souza"
+    }
+  ],
+  "metrics": {
+    "clientes": 47,
+    "vendedores": 5,
+    "auditorias": 188,
+    "conflitos": 3,
+    "bairros": [
+      {
+        "nome": "Águas Claras",
+        "total": 21
+      },
+      {
+        "nome": "Taguatinga",
+        "total": 13
+      },
+      {
+        "nome": "Vicente Pires",
+        "total": 6
+      },
+      {
+        "nome": "Guará",
+        "total": 6
+      },
+      {
+        "nome": "Não Informado",
+        "total": 1
+      }
+    ],
+    "campos": [
+      {
+        "campo": "CNPJ",
+        "total": 38
+      },
+      {
+        "campo": "CEP",
+        "total": 47
+      },
+      {
+        "campo": "BAIRRO",
+        "total": 42
+      },
+      {
+        "campo": "TELEFONE",
+        "total": 37
+      },
+      {
+        "campo": "DATA_CADASTRO",
+        "total": 24
+      }
+    ]
+  }
+}
