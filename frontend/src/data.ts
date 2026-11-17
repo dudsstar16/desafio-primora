@@ -1,4 +1,5 @@
 import type { Client, Metrics, PresentationData, Seller, Snapshot } from './types'
+import offlineSnapshot from '../public/snapshot.json'
 
 const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 const timeout = 2500
@@ -30,6 +31,9 @@ export function normalizeMetrics(payload: Record<string, unknown>): Metrics {
 }
 
 export async function loadPresentationData(): Promise<PresentationData> {
+  if (import.meta.env.VITE_OFFLINE_DEMO === 'true') {
+    return { ...(offlineSnapshot as Snapshot), source: 'fallback' }
+  }
   try {
     const [clients, sellers, rawMetrics] = await Promise.all([
       getJson<Client[]>('/api/clientes/'),

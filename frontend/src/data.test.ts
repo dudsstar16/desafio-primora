@@ -1,9 +1,20 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { loadPresentationData, normalizeMetrics } from './data'
 
-afterEach(() => vi.unstubAllGlobals())
+afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs() })
 
 describe('dados da apresentação', () => {
+  it('carrega o snapshot incorporado sem fazer requisições no modo offline', async () => {
+    vi.stubEnv('VITE_OFFLINE_DEMO', 'true')
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const result = await loadPresentationData()
+    expect(result.source).toBe('fallback')
+    expect(result.clients).toHaveLength(47)
+    expect(result.sellers).toHaveLength(5)
+    expect(result.metrics).toMatchObject({ clientes: 47, vendedores: 5, auditorias: 188, conflitos: 3 })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
   it('normaliza o contrato agregado retornado pelo Django', () => {
     const metrics = normalizeMetrics({
       totals: { clients: 2, sellers: 1, audit_changes: 4, corrected_conflicts: 1 },
