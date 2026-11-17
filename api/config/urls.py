@@ -6,9 +6,14 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from .views import health, presentation_metrics
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Endpoints públicos, somente leitura, usados pelo site de apresentação
+    path('api/health/', health, name='api-health'),
+    path('api/apresentacao/metricas/', presentation_metrics, name='presentation-metrics'),
 
     # Autenticação via Token
     path('api/auth/token/', obtain_auth_token, name='api_token_auth'),

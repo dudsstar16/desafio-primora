@@ -29,6 +29,22 @@ O desafio é dividido em duas frentes:
    - Implementar regras de autenticação via Token.
    - Disponibilizar documentação OpenAPI / Redoc.
 
+### Experiência Interativa para a Apresentação
+
+O diretório `frontend/` contém uma narrativa visual em React que apresenta o caminho completo do dado: caos inicial, pipeline ETL, guardrails, auditoria, resultados, arquitetura e testes. A interface consulta a API Django e muda automaticamente para um snapshot local verificado se o servidor não responder em 2,5 segundos.
+
+```powershell
+# Terminal 1 — API
+python api/manage.py runserver
+
+# Terminal 2 — experiência interativa
+cd frontend
+npm install
+npm run dev
+```
+
+Acesse `http://127.0.0.1:5173`. A publicação completa está declarada em `render.yaml` com frontend estático, API Django e PostgreSQL.
+
 ---
 
 ## 📁 Estrutura do Repositório

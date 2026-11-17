@@ -206,6 +206,12 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Frontend React / Vite
+node_modules/
+frontend/dist/
+frontend/coverage/
+*.tsbuildinfo
+
 # Ruff stuff:
 .ruff_cache/
 

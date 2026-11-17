@@ -1,6 +1,8 @@
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 import os
+from urllib.parse import unquote, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
@@ -9,10 +11,24 @@ load_dotenv(PROJECT_ROOT / ".env")
 load_dotenv(BASE_DIR / ".env")
 
 
-SECRET_KEY = 'django-insecure-#tn&63j)sqd6orl^$s8s)k&_3lt^5&_kgbo#g8ism!9!dx(au4'
+def env_bool(name, default=False):
+    return os.getenv(name, str(default)).strip().lower() in {'1', 'true', 'yes', 'on'}
 
-DEBUG = True
-ALLOWED_HOSTS = []
+
+def env_list(name, default=''):
+    return [item.strip() for item in os.getenv(name, default).split(',') if item.strip()]
+
+
+DEBUG = env_bool('DEBUG', True)
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY and not DEBUG:
+    raise ImproperlyConfigured('SECRET_KEY é obrigatória quando DEBUG=False.')
+SECRET_KEY = SECRET_KEY or 'django-insecure-local-development-only-change-me'
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', '127.0.0.1,localhost,testserver')
+
+render_hostname = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
 
 
 INSTALLED_APPS = [
@@ -27,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_spectacular',
     'django_filters',
+    'corsheaders',
 
     'clientes',
     'vendedores',
@@ -35,6 +52,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,10 +83,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Banco de dados (PostgreSQL via .env ou SQLite populado pelo ETL por padrão)
+# Banco de dados (DATABASE_URL/variáveis PostgreSQL ou SQLite do ETL por padrão)
+_database_url = os.getenv('DATABASE_URL')
 _db_name = os.getenv('DB_NAME') or os.getenv('POSTGRES_DB')
 
-if _db_name:
+if _database_url:
+    parsed_db_url = urlparse(_database_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': unquote(parsed_db_url.path.lstrip('/')),
+            'USER': unquote(parsed_db_url.username or ''),
+            'PASSWORD': unquote(parsed_db_url.password or ''),
+            'HOST': parsed_db_url.hostname or 'localhost',
+            'PORT': parsed_db_url.port or '5432',
+            'CONN_MAX_AGE': 600,
+        }
+    }
+elif _db_name:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -103,12 +136,29 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+CORS_ALLOWED_ORIGINS = env_list(
+    'CORS_ALLOWED_ORIGINS',
+    'http://localhost:5173,http://127.0.0.1:5173' if DEBUG else '',
+)
+CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS')
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 
 MAILERS = {
