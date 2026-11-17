@@ -1,3 +1,4 @@
+from django.core.management import get_commands
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -27,6 +28,9 @@ class PresentationEndpointsTests(APITestCase):
         response = self.client.get('/api/health/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'status': 'ok', 'database': 'available'})
+
+    def test_bootstrap_command_is_discoverable(self):
+        self.assertIn('bootstrap_primora', get_commands())
 
     def test_metrics_are_aggregated_and_public(self):
         response = self.client.get('/api/apresentacao/metricas/')
