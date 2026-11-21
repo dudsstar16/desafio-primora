@@ -13,11 +13,11 @@ class Cliente(models.Model):
     uf = models.CharField(max_length=2)
     data_cadastro_normalizado = models.DateField()
     vendedor = models.ForeignKey(
-    'vendedores.Vendedor',
-    on_delete=models.DO_NOTHING,
-    db_column='vendedor_id',
-    related_name='clientes'
-)
+        'vendedores.Vendedor',
+        on_delete=models.PROTECT,
+        db_column='vendedor_id',
+        related_name='clientes',
+    )
 
     class Meta:
         db_table = 'cliente'
@@ -38,7 +38,7 @@ class AuditoriaEtl(models.Model):
     id_auditoria = models.BigAutoField(primary_key=True)
     cliente = models.ForeignKey(
         Cliente,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         db_column='id_cliente',
         related_name='logs_auditoria',
     )

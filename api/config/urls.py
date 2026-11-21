@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework.authtoken.views import obtain_auth_token
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from .views import health, presentation_metrics
+from .views import DashboardTokenView, current_user, health, presentation_metrics
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -16,7 +15,8 @@ urlpatterns = [
     path('api/apresentacao/metricas/', presentation_metrics, name='presentation-metrics'),
 
     # Autenticação via Token
-    path('api/auth/token/', obtain_auth_token, name='api_token_auth'),
+    path('api/auth/token/', DashboardTokenView.as_view(), name='api_token_auth'),
+    path('api/auth/me/', current_user, name='dashboard-user'),
     path('api-auth/', include('rest_framework.urls')),
 
     # Documentação Interativa OpenAPI (Redoc e Swagger)

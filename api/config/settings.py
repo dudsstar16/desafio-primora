@@ -188,7 +188,12 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'API Primora — Distribuidora Vetor',
-    'DESCRIPTION': 'Documentação interativa da API REST de Clientes e Vendedores (após tratamento ETL)',
+    'DESCRIPTION': (
+        'Consultas públicas de clientes exibem somente os dois últimos dígitos do CNPJ, '
+        'os quatro últimos do telefone e a inicial e o domínio do e-mail. '
+        'Contas autenticadas consultam os valores completos e podem alterar os cadastros. '
+        'Exclusões com vínculos protegidos retornam HTTP 409.'
+    ),
     'VERSION': '1.0.0',
     'REDOC_DIST': 'https://cdn.jsdelivr.net/npm/redoc@2.1.5',
 }

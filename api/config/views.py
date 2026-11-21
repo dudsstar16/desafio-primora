@@ -1,13 +1,42 @@
 from django.db import connection
 from django.db.models import Count
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from django.views.decorators.cache import never_cache
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view, inline_serializer
+from rest_framework import serializers
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from clientes.models import AuditoriaEtl, Cliente
 from vendedores.models import Vendedor
 
 
+@extend_schema_view(post=extend_schema(auth=[], description='Troca usuário e senha por um token DRF.'))
+class DashboardTokenView(ObtainAuthToken):
+    pass
+
+
+@extend_schema(responses={
+    200: inline_serializer('DashboardUser', fields={
+        'username': serializers.CharField(), 'can_write': serializers.BooleanField(),
+    }),
+    401: OpenApiResponse(description='Token ausente ou inválido.'),
+})
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+@never_cache
+def current_user(request):
+    """Valida o token do painel e informa quem pode manter os cadastros."""
+    return Response({'username': request.user.get_username(), 'can_write': True})
+
+
+@extend_schema(responses=inline_serializer('Health', fields={
+    'status': serializers.CharField(), 'database': serializers.CharField(),
+}))
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def health(request):
@@ -18,6 +47,7 @@ def health(request):
     return Response({'status': 'ok', 'database': 'available'})
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def presentation_metrics(request):

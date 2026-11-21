@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
-from rest_framework import viewsets
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from config.dashboard import DashboardViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -15,11 +16,16 @@ if str(PROJECT_ROOT) not in sys.path:
 from etl.transform_address import canonicalize_neighborhood_name  # noqa: E402
 
 
-class ClienteViewSet(viewsets.ModelViewSet):
+class ClienteViewSet(DashboardViewSet):
+    protected_message = 'Este cliente possui registros de auditoria e deve ser preservado.'
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
     filterset_fields = ['bairro_normalizado', 'vendedor']
 
+    @extend_schema(
+        parameters=[OpenApiParameter('nome', str, OpenApiParameter.PATH)],
+        responses=ClienteSerializer(many=True),
+    )
     @action(detail=False, methods=['get'], url_path='bairro/(?P<nome>[^/.]+)')
     def buscar_por_bairro(self, request, nome=None):
         """
@@ -32,6 +38,10 @@ class ClienteViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(clientes, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        parameters=[OpenApiParameter('id_vendedor', int, OpenApiParameter.PATH)],
+        responses=ClienteSerializer(many=True),
+    )
     @action(detail=False, methods=['get'], url_path='vendedor/(?P<id_vendedor>[^/.]+)')
     def buscar_por_vendedor(self, request, id_vendedor=None):
         """Lista clientes atendidos por um vendedor específico."""

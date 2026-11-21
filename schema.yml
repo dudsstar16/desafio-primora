@@ -2,11 +2,50 @@ openapi: 3.0.3
 info:
   title: API Primora — Distribuidora Vetor
   version: 1.0.0
-  description: Documentação interativa da API REST de Clientes e Vendedores (após tratamento ETL)
+  description: Consultas públicas de clientes exibem somente os dois últimos dígitos
+    do CNPJ, os quatro últimos do telefone e a inicial e o domínio do e-mail. Contas
+    autenticadas consultam os valores completos e podem alterar os cadastros. Exclusões
+    com vínculos protegidos retornam HTTP 409.
 paths:
+  /api/apresentacao/metricas/:
+    get:
+      operationId: apresentacao_metricas_retrieve
+      description: Agregados seguros para a apresentação; nunca expõe linhas da auditoria.
+      tags:
+      - apresentacao
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/auth/me/:
+    get:
+      operationId: auth_me_retrieve
+      description: Valida o token do painel e informa quem pode manter os cadastros.
+      tags:
+      - auth
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardUser'
+          description: ''
+        '401':
+          description: Token ausente ou inválido.
   /api/auth/token/:
     post:
       operationId: auth_token_create
+      description: Troca usuário e senha por um token DRF.
       tags:
       - auth
       requestBody:
@@ -21,9 +60,6 @@ paths:
             schema:
               $ref: '#/components/schemas/AuthToken'
         required: true
-      security:
-      - tokenAuth: []
-      - cookieAuth: []
       responses:
         '200':
           content:
@@ -34,7 +70,8 @@ paths:
   /api/clientes/:
     get:
       operationId: clientes_list
-      description: Lista todos os clientes tratados e padronizados pelo pipeline de ETL.
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: query
         name: bairro_normalizado
@@ -61,6 +98,8 @@ paths:
           description: ''
     post:
       operationId: clientes_create
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       tags:
       - clientes
       requestBody:
@@ -88,12 +127,14 @@ paths:
   /api/clientes/{id_cliente}/:
     get:
       operationId: clientes_retrieve
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: path
         name: id_cliente
         schema:
           type: string
-        description: Identificador único do cliente (ex. CLI0001).
+        description: Um valor único que identifica este Cliente.
         required: true
       tags:
       - clientes
@@ -110,11 +151,14 @@ paths:
           description: ''
     put:
       operationId: clientes_update
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: path
         name: id_cliente
         schema:
           type: string
+        description: Um valor único que identifica este Cliente.
         required: true
       tags:
       - clientes
@@ -142,11 +186,14 @@ paths:
           description: ''
     patch:
       operationId: clientes_partial_update
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: path
         name: id_cliente
         schema:
           type: string
+        description: Um valor único que identifica este Cliente.
         required: true
       tags:
       - clientes
@@ -173,11 +220,14 @@ paths:
           description: ''
     delete:
       operationId: clientes_destroy
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: path
         name: id_cliente
         schema:
           type: string
+        description: Um valor único que identifica este Cliente.
         required: true
       tags:
       - clientes
@@ -187,19 +237,33 @@ paths:
       responses:
         '204':
           description: No response body
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteConflict'
+          description: ''
   /api/clientes/bairro/{nome}/:
     get:
-      operationId: clientes_buscar_por_bairro
+      operationId: clientes_bairro_list
       description: |-
         Lista clientes por bairro normalizado.
         Aceita tanto o nome exato ('Águas Claras') quanto variações sem acento
         ou informais ('aguas claras', 'guara ii', 'vte pires') usando a regra do ETL!
       parameters:
+      - in: query
+        name: bairro_normalizado
+        schema:
+          type: string
       - in: path
         name: nome
         schema:
           type: string
         required: true
+      - in: query
+        name: vendedor
+        schema:
+          type: integer
       tags:
       - clientes
       security:
@@ -217,14 +281,22 @@ paths:
           description: ''
   /api/clientes/vendedor/{id_vendedor}/:
     get:
-      operationId: clientes_buscar_por_vendedor
+      operationId: clientes_vendedor_list
       description: Lista clientes atendidos por um vendedor específico.
       parameters:
+      - in: query
+        name: bairro_normalizado
+        schema:
+          type: string
       - in: path
         name: id_vendedor
         schema:
-          type: string
+          type: integer
         required: true
+      - in: query
+        name: vendedor
+        schema:
+          type: integer
       tags:
       - clientes
       security:
@@ -239,6 +311,23 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Cliente'
+          description: ''
+  /api/health/:
+    get:
+      operationId: health_retrieve
+      description: Sinal mínimo de saúde, sem detalhes internos do ambiente.
+      tags:
+      - health
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
           description: ''
   /api/schema/:
     get:
@@ -256,6 +345,110 @@ paths:
           enum:
           - json
           - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
       tags:
       - schema
       security:
@@ -285,6 +478,8 @@ paths:
   /api/vendedores/:
     get:
       operationId: vendedores_list
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       tags:
       - vendedores
       security:
@@ -302,6 +497,8 @@ paths:
           description: ''
     post:
       operationId: vendedores_create
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       tags:
       - vendedores
       requestBody:
@@ -329,12 +526,14 @@ paths:
   /api/vendedores/{id_vendedor}/:
     get:
       operationId: vendedores_retrieve
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: path
         name: id_vendedor
         schema:
           type: integer
-        description: A unique integer value identifying this Vendedor.
+        description: Um valor inteiro único que identifica este Vendedor.
         required: true
       tags:
       - vendedores
@@ -351,12 +550,14 @@ paths:
           description: ''
     put:
       operationId: vendedores_update
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: path
         name: id_vendedor
         schema:
           type: integer
-        description: A unique integer value identifying this Vendedor.
+        description: Um valor inteiro único que identifica este Vendedor.
         required: true
       tags:
       - vendedores
@@ -384,12 +585,14 @@ paths:
           description: ''
     patch:
       operationId: vendedores_partial_update
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: path
         name: id_vendedor
         schema:
           type: integer
-        description: A unique integer value identifying this Vendedor.
+        description: Um valor inteiro único que identifica este Vendedor.
         required: true
       tags:
       - vendedores
@@ -416,12 +619,14 @@ paths:
           description: ''
     delete:
       operationId: vendedores_destroy
+      description: CRUD com proteção de vínculos e representações específicas por
+        usuário.
       parameters:
       - in: path
         name: id_vendedor
         schema:
           type: integer
-        description: A unique integer value identifying this Vendedor.
+        description: Um valor inteiro único que identifica este Vendedor.
         required: true
       tags:
       - vendedores
@@ -431,9 +636,15 @@ paths:
       responses:
         '204':
           description: No response body
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteConflict'
+          description: ''
   /api/vendedores/{id_vendedor}/clientes/:
     get:
-      operationId: vendedores_listar_clientes_do_vendedor
+      operationId: vendedores_clientes_list
       description: |-
         Rota exigida pelo PDF: /api/vendedores/{id}/clientes/
         Lista todos os clientes atendidos pelo vendedor informado.
@@ -442,6 +653,7 @@ paths:
         name: id_vendedor
         schema:
           type: integer
+        description: Um valor inteiro único que identifica este Vendedor.
         required: true
       tags:
       - vendedores
@@ -466,9 +678,11 @@ components:
         username:
           type: string
           writeOnly: true
+          title: Nome de usuário
         password:
           type: string
           writeOnly: true
+          title: Senha
         token:
           type: string
           readOnly: true
@@ -478,6 +692,8 @@ components:
       - username
     Cliente:
       type: object
+      description: Nas consultas públicas, apenas os finais do CNPJ e do telefone
+        e a inicial e o domínio do e-mail são visíveis.
       properties:
         id_cliente:
           type: string
@@ -523,8 +739,43 @@ components:
       - telefone_normalizado
       - uf
       - vendedor_id
+    DashboardUser:
+      type: object
+      properties:
+        username:
+          type: string
+        can_write:
+          type: boolean
+      required:
+      - can_write
+      - username
+    DeleteConflict:
+      type: object
+      properties:
+        code:
+          type: string
+        detail:
+          type: string
+        related_count:
+          type: integer
+      required:
+      - code
+      - detail
+      - related_count
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+        database:
+          type: string
+      required:
+      - database
+      - status
     PatchedCliente:
       type: object
+      description: Nas consultas públicas, apenas os finais do CNPJ e do telefone
+        e a inicial e o domínio do e-mail são visíveis.
       properties:
         id_cliente:
           type: string
