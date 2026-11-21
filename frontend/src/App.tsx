@@ -14,6 +14,8 @@ import Pipeline from './Pipeline'
 import Decision from './Decision'
 import Architecture from './Architecture'
 import ApiDemo from './ApiDemo'
+import '@xyflow/react/dist/style.css'
+import './presentation-dashboard-link.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -132,6 +134,7 @@ function App() {
     <header className="topbar">
       <button className="brand" onClick={() => goTo('caos')} aria-label="Voltar ao início"><Sparkles size={16} /> PRIMORA <span>data story</span></button>
       <div className="top-actions">
+        {import.meta.env.VITE_OFFLINE_DEMO !== 'true' && <a className="presentation-dashboard-link" href="/dashboard">Painel <ArrowRight size={14} /></a>}
         <span className={`source-badge ${data?.source || 'loading'}`}><i />{isLoading ? 'Conectando' : data?.source === 'live' ? 'Dados ao vivo' : 'Modo demonstração'}</span>
         <button className="mode-button" onClick={() => setPresentMode((value) => !value)}>{presentMode ? <Pause size={15} /> : <Play size={15} />}{presentMode ? 'Sair da apresentação' : 'Modo apresentação'}</button>
         <button className="icon-button" onClick={() => setMenuOpen((value) => !value)} aria-label="Abrir capítulos" aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>

@@ -1,0 +1,18 @@
+.top-actions .presentation-dashboard-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .52rem .85rem;
+  border: 1px solid currentColor;
+  border-radius: 99px;
+  color: inherit;
+  text-decoration: none;
+  font-size: .75rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.presentation-dashboard-link:hover {
+  background: var(--cream);
+  color: var(--black);
+}
