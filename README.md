@@ -47,6 +47,33 @@ Acesse `http://127.0.0.1:5173`. A publicação completa está declarada em `rend
 
 ---
 
+## Painel operacional
+
+Abra `/dashboard` no frontend para consultar clientes, vendedores e a saúde da API. O botão **Painel** na apresentação abre essa interface.
+
+Visitantes consultam cadastros com CNPJ, telefone e e-mail mascarados pela API. Uma conta Django ativa libera os valores completos e a manutenção dos cadastros, conforme os requisitos do desafio. A equipe pode criar contas autorizadas pelo Django Admin ou pelo comando `createsuperuser` descrito abaixo.
+
+É possível editar razão social, contato, CNPJ e vendedor responsável de um cliente auditado. Para substituir um vendedor, cadastre o sucessor e transfira os clientes pelo campo **Vendedor** de cada cliente. O vendedor anterior pode ser excluído depois que sua carteira ficar vazia. A exclusão de cliente com auditorias retorna HTTP 409. O ID do cliente permanece fixo para preservar o vínculo com o histórico.
+
+As 188 transformações originais do ETL representam o tratamento inicial da base. As alterações pelo painel atualizam o cadastro atual. Um histórico adicional dessas alterações operacionais requer uma funcionalidade própria.
+
+O token fica em `sessionStorage`. **Sair** remove o token e o cache autenticado desta página. O token DRF continua válido no servidor até ser revogado. Outras abas com sessão própria podem continuar conectadas.
+
+Para atualizar uma instalação, execute `python api/manage.py migrate --noinput` antes de servir a nova API. O Render executa as migrações pelo comando de inicialização. A migração `0003_proteger_vinculos` registra a proteção das relações cliente–auditoria e vendedor–cliente.
+
+O painel usa dados ao vivo e oferece nova tentativa quando a API está indisponível. O snapshot da apresentação fica disponível em `/`.
+
+### Verificações do dashboard
+
+```powershell
+python api/manage.py test config clientes vendedores -v 2
+cd frontend
+npm test
+npm run build
+```
+
+Os testes de sessão verificam consultas públicas, remoção de token inválido e descarte de respostas autenticadas que chegam após o logout. O comando de build atualiza o horário do snapshot gerado.
+
 ## 📁 Estrutura do Repositório
 
 ```text

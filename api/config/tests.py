@@ -66,6 +66,44 @@ class PresentationEndpointsTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'username': 'operadora', 'can_write': True})
 
+    def test_all_write_methods_reject_anonymous_and_invalid_tokens(self):
+        before_clients = list(Cliente.objects.values())
+        before_sellers = list(Vendedor.objects.values())
+        for token in (None, 'invalido'):
+            self.client.credentials(**({'HTTP_AUTHORIZATION': 'Token ' + token} if token else {}))
+            for root, identifier in (('clientes', 'CLI0002'), ('vendedores', self.seller.pk)):
+                for method in ('post', 'put', 'patch', 'delete'):
+                    path = f'/api/{root}/' if method == 'post' else f'/api/{root}/{identifier}/'
+                    with self.subTest(token=token, method=method, path=path):
+                        response = getattr(self.client, method)(path, {}, format='json')
+                        self.assertEqual(response.status_code, 401)
+        self.assertEqual(list(Cliente.objects.values()), before_clients)
+        self.assertEqual(list(Vendedor.objects.values()), before_sellers)
+
+    def test_disabled_account_token_is_rejected(self):
+        self.login_with_token()
+        get_user_model().objects.filter(username='operadora').update(is_active=False)
+        for path in ('/api/auth/me/', '/api/clientes/', '/api/vendedores/'):
+            self.assertEqual(self.client.get(path).status_code, 401)
+        self.assertEqual(self.client.patch('/api/clientes/CLI0002/', {
+            'razao_social': 'Alteração indevida',
+        }, format='json').status_code, 401)
+
+    def test_session_write_requires_csrf_and_audit_stays_admin_only(self):
+        from rest_framework.test import APIClient
+
+        get_user_model().objects.create_user(username='leitor', password='senha-teste')
+        browser = APIClient(enforce_csrf_checks=True)
+        self.assertTrue(browser.login(username='leitor', password='senha-teste'))
+        self.assertEqual(browser.get('/api/clientes/').status_code, 200)
+        self.assertEqual(browser.patch('/api/clientes/CLI0002/', {
+            'razao_social': 'Sem CSRF',
+        }, format='json').status_code, 403)
+        self.assertEqual(browser.get('/api/auth/me/').status_code, 401)
+        self.assertEqual(browser.get('/admin/clientes/auditoriaetl/').status_code, 302)
+        for path in ('/api/auditoria/', '/api/auditoria_etl/'):
+            self.assertEqual(self.client.get(path).status_code, 404)
+
     def test_protected_records_and_unlinked_customer(self):
         self.login_with_token()
         for route in ('/api/clientes/CLI0002/', f'/api/vendedores/{self.seller.pk}/'):
