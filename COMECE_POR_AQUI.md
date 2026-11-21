@@ -82,7 +82,8 @@ Aqui está a explicação do que ela é:
 | `docs/modelagem/` | Desenho das tabelas do banco de dados (MER e DER). |
 | `docs/relatorios/` | Relatório final explicando as decisões que tomamos. |
 | `etl/` | Códigos em Python que extraem, limpam, auditam e salvam os dados. |
-| `api/` | Nosso sistema web em Django com as rotas *(passo futuro)*. |
+| `api/` | Nosso sistema web em Django REST Framework com todas as rotas, segurança por Token e Admin. |
+| `frontend/` | Nossa interface visual em React: apresentação interativa (`/`) e painel operacional (`/dashboard`). |
 | `tests/` | Testes automáticos que conferem as principais regras do ETL. |
 | `scripts/` | Script que cria e preenche as tabelas no PostgreSQL. |
 
@@ -111,7 +112,5 @@ Para ninguém apagar o trabalho do colega sem querer:
   **Resposta:** Clone o repositório, crie seu `venv`, ative o `venv` e instale as dependências (`pip install -r requirements.txt`).
 - **Pergunta:** Como vejo o resultado sem instalar um banco?
   **Resposta:** Abra `data/processed/visualizar_tabelas.html` no navegador.
-- **Pergunta:** Como uso os dados no Django?
-  **Resposta:** Leia `docs/arquitetura/guia_banco_para_equipe_api.md`. O guia mostra a opção SQLite e a opção PostgreSQL.
-- **Pergunta:** Qual é o próximo passo do grupo?
-  **Resposta:** Construir a API Django usando as tabelas e regras que já estão prontas.
+- **Pergunta:** Como uso os dados no Django e na interface visual?
+  **Resposta:** Leia `docs/arquitetura/guia_banco_para_equipe_api.md` e o passo a passo no `README.md`. O projeto já conta com a API Django completa e com o frontend em React (`/` para a apresentação e `/dashboard` para o painel operacional).

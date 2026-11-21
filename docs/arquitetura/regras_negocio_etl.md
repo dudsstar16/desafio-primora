@@ -11,7 +11,7 @@
 - **O que o ETL faz:**
   1. Consulta o CEP no ViaCEP ou na BrasilAPI (ou usa o cache local já preenchido).
   2. Se o CEP for encontrado, o bairro retornado pelo serviço substitui o bairro digitado.
-  3. **Obrigatório:** Registra um alerta na tabela de **Auditoria** com o motivo: `CONFLITO_CEP_BAIRRO_CORRIGIDO_POR_CEP_OFICIAL`.
+  3. **Obrigatório:** Registra um alerta na tabela de **Auditoria** com o motivo: `GUARDRAIL_CONFLITO_CEP_VENCEU_TEXTO`.
 - **E se o CEP for inválido (`00000-000`) ou estiver vazio?**
   1. O CEP inválido é descartado (vira `NULL` / vazio).
   2. Usamos o texto do `bairro_informado` limpo pelo nosso Dicionário de Bairros.

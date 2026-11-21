@@ -93,14 +93,19 @@ desafio-primora/
 │
 ├── api/                    # Aplicação web backend em Django e Django REST Framework
 │
-├── tests/                  # Testes automatizados (pytest)
+├── frontend/               # Experiência interativa (/) e Painel Operacional (/dashboard) em React + Vite
 │
-├── scripts/                # Scripts auxiliares e migrações SQL
+├── tests/                  # Testes automatizados do pipeline ETL (unittest / pytest)
 │
+├── scripts/                # Script de carga e migração SQL para PostgreSQL
+│
+├── .github/workflows/      # Automação de Integração Contínua (CI - GitHub Actions)
 ├── .gitignore              # Arquivos e pastas ignorados pelo controle de versão Git
 ├── COMECE_POR_AQUI.md      # Guia rápido e simples para todos os integrantes
-├── README.md               # Documentação inicial e guia do projeto
-└── requirements.txt        # Dependências e bibliotecas do projeto
+├── README.md               # Documentação principal e guia do projeto
+├── render.yaml             # Declaração de deploy (PostgreSQL, API Django e Frontend React) no Render
+├── requirements.txt        # Dependências e bibliotecas Python do projeto
+└── schema.yml              # Contrato OpenAPI 3.0 completo da API REST
 ```
 
 ### Finalidade das Pastas
@@ -108,16 +113,17 @@ desafio-primora/
 | Pasta | Finalidade |
 | :--- | :--- |
 | `docs/requisitos` | PDFs e critérios oficiais do desafio |
-| `docs/arquitetura` | Planejamento técnico e fluxogramas |
+| `docs/arquitetura` | Planejamento técnico, regras de negócio e arquitetura ponta a ponta |
 | `docs/modelagem` | MER (Modelo Entidade-Relacionamento) e DER (Diagrama) |
-| `docs/relatorios` | Relatório de decisões e trade-offs (escolhas técnicas) |
+| `docs/relatorios` | Relatório de decisões/trade-offs do ETL e relatório de testes da API |
 | `data/raw` | CSV original fornecido pela empresa |
 | `data/processed` | Banco SQLite, CSVs limpos, auditoria, cache de CEP e painel HTML |
 | `etl` | Pipeline em Python: extração, limpeza, auditoria e carga |
-| `api` | Projeto Django e endpoints da API REST (`vendedores`, `clientes` e autenticação) |
+| `api` | Projeto Django e endpoints da API REST (`vendedores`, `clientes`, autenticação e métricas) |
+| `frontend` | Interface visual em React + TypeScript: narrativa de apresentação (`/`) e painel operacional (`/dashboard`) |
 | `tests` | Testes automatizados das regras de limpeza e dos conflitos de CEP |
 | `scripts` | Script pronto para carregar as tabelas no PostgreSQL |
-| `.github/workflows` | Automação de Integração Contínua (CI - GitHub Actions) que executa os testes do ETL e da API a cada Push/PR |
+| `.github/workflows` | Automação de Integração Contínua (CI - GitHub Actions) que valida ETL, API (Python 3.11) e Frontend (Node 22) a cada Push/PR |
 
 ---
 
@@ -281,29 +287,37 @@ Com o servidor ligado (`runserver`), acesse qualquer um dos endereços abaixo:
 
 | Rota / Endpoint | O que faz | Permissão |
 | :--- | :--- | :--- |
-| **`/api/docs/`** | **Documentação Interativa Redoc** (manual visual completo da API) | Pública |
-| **`/api/swagger/`** | **Documentação Swagger UI** (permite testar as rotas clicando na tela) | Pública |
-| **`/api/clientes/`** | Lista todos os 47 clientes tratados (`GET`) ou cadastra novo (`POST`) | `GET` Público / `POST` Token |
-| **`/api/clientes/{id}/`** | Detalhes de um cliente específico (ex: `/api/clientes/CLI0001/`) | `GET` Público / Edição Token |
+| **`/api/health/`** | Verifica a saúde da API e a disponibilidade do banco de dados (`SELECT 1`) | Pública (`GET`) |
+| **`/api/apresentacao/metricas/`** | Retorna contagens agregadas de clientes, vendedores, auditorias por campo e conflitos | Pública (`GET`) |
+| **`/api/docs/`** | **Documentação Interativa Redoc** (manual visual completo da API) | Pública (`GET`) |
+| **`/api/swagger/`** | **Documentação Swagger UI** (permite testar as rotas clicando na tela) | Pública (`GET`) |
+| **`/api/clientes/`** | Lista os 47 clientes tratados (`GET` público com CNPJ/telefone/e-mail mascarados; completo com Token) ou cadastra novo (`POST`) | `GET` Público / Escrita Token |
+| **`/api/clientes/{id}/`** | Detalhes, edição ou exclusão de cliente (retorna `409 Conflict` se houver auditoria vinculada) | `GET` Público / Escrita Token |
 | **`/api/clientes/bairro/{nome}/`** | Filtra clientes por bairro com ou sem acento (ex: `/api/clientes/bairro/aguas claras/`) | Pública (`GET`) |
 | **`/api/clientes/vendedor/{id}/`** | Lista clientes atendidos por um vendedor (ex: `/api/clientes/vendedor/1/`) | Pública (`GET`) |
-| **`/api/vendedores/`** | Lista os 5 vendedores (`GET`) ou cadastra novo (`POST`) | `GET` Público / `POST` Token |
+| **`/api/vendedores/`** | Lista os 5 vendedores (`GET`) ou cadastra novo (`POST`) | `GET` Público / Escrita Token |
+| **`/api/vendedores/{id}/`** | Detalhes, edição ou exclusão de vendedor (retorna `409 Conflict` se ainda atender clientes) | `GET` Público / Escrita Token |
 | **`/api/vendedores/{id}/clientes/`** | Lista todos os clientes daquele vendedor (ex: `/api/vendedores/1/clientes/`) | Pública (`GET`) |
 | **`/api/auth/token/`** | Envia `username` e `password` via `POST` e recebe o Token de autenticação | Pública (`POST`) |
+| **`/api/auth/me/`** | Valida o Token atual do painel e confirma permissão de escrita (`can_write`) | Restrito (Token) |
 | **`/admin/`** | **Painel Administrativo Django** (acesso às 3 tabelas, incluindo **`Auditoria do ETL`**) | Restrito (Login Admin) |
 
 ---
 
-### 🧪 4. Como Rodar os 20 Testes Automatizados
+### 🧪 4. Como Rodar os 37 Testes Automatizados (ETL + API Django + Frontend React)
 
-Nosso projeto possui **20 testes automatizados** (também executados automaticamente a cada envio pelo **GitHub Actions**):
+Nosso projeto possui **37 verificações automatizadas** (7 no ETL + 24 na API Django + 6 no Frontend React), todas executadas automaticamente a cada envio pelo **GitHub Actions**:
 
 ```bash
 # 1. Rodar os 7 testes do Pipeline ETL (com simulação Mock da API de CEP):
 python -m unittest discover -s tests -v
 
-# 2. Rodar os 13 testes da API Django (8 de Vendedores + 5 de Clientes e Documentação):
-python api/manage.py test vendedores clientes -v 2
+# 2. Rodar os 24 testes da API Django (Permissões, Máscaras, Vínculos 409, Vendedores, Clientes e Documentação):
+python api/manage.py test config clientes vendedores -v 2
+
+# 3. Rodar os 6 testes do Frontend React (Apresentação, Sessão do Dashboard e Build):
+cd frontend
+npm test
 ```
 
 ---

@@ -31,22 +31,23 @@ flowchart TD
         ARTEFATOS["📊 Artefatos Exportados<br/>banco_primora.sqlite3 | carga_postgresql.sql<br/>CSVs limpos | visualizar_tabelas.html"]
     end
 
-    subgraph C4["🚀 4. Camada de Aplicação e Consumo (Django + DRF - api/)"]
-        ORM["🧱 Models Django (managed=True)<br/>Mapeamento db_table: vendedor, cliente, auditoria_etl"]
-        AUTH["🔐 Autenticação e Controle de Acesso<br/>Token Auth (/api/auth/token/)<br/>Permissão Global: IsAuthenticatedOrReadOnly"]
-        API_ROTAS["🌐 Endpoints da API REST<br/>/api/clientes/ | /api/vendedores/<br/>/api/clientes/bairro/{nome}/<br/>/api/clientes/vendedor/{id}/<br/>/api/vendedores/{id}/clientes/"]
+    subgraph C4["🚀 4. Camada de Aplicação e Consumo (Django + DRF + React)"]
+        ORM["🧱 Models Django (managed=True)<br/>Mapeamento db_table: vendedor, cliente, auditoria_etl<br/>Vínculos protegidos (PROTECT / HTTP 409)"]
+        AUTH["🔐 Autenticação e Controle de Acesso<br/>Token Auth (/api/auth/token/ e /api/auth/me/)<br/>IsAuthenticatedOrReadOnly + Máscaras Públicas"]
+        API_ROTAS["🌐 Endpoints da API REST<br/>/api/clientes/ | /api/vendedores/<br/>/api/clientes/bairro/{nome}/ | /api/clientes/vendedor/{id}/<br/>/api/vendedores/{id}/clientes/ | /api/health/ | /api/apresentacao/metricas/"]
+        FRONTEND["🖥️ Frontend React (frontend/)<br/>Apresentação Interativa (/) + Snapshot Fallback<br/>Painel Operacional Híbrido (/dashboard)"]
         ADMIN["🔒 Django Admin (/admin/)<br/>Gerencia Vendedor e Cliente<br/>Exibe auditoria_etl (Restrita ao Admin)"]
         OPENAPI["📖 Documentação OpenAPI 3.0 (drf-spectacular)<br/>/api/docs/ (Redoc) | /api/swagger/ (Swagger UI)"]
     end
 
     subgraph C_USERS["👥 Perfis de Consumo"]
-        U_PUB["👤 Visitante Não Autenticado<br/>Apenas Leitura (GET)"]
-        U_AUTH["🔑 Usuário Autenticado (Token)<br/>CRUD Completo (GET, POST, PUT, PATCH, DELETE)"]
+        U_PUB["👤 Visitante Não Autenticado<br/>Apenas Leitura (GET) com CNPJ/Telefone/E-mail Mascarados"]
+        U_AUTH["🔑 Usuário Autenticado (Token)<br/>Dados Completos + CRUD (GET, POST, PUT, PATCH, DELETE)"]
         U_ADM["🛡️ Administrador<br/>Painel Django Admin + Auditoria"]
     end
 
     subgraph C5["🤖 5. Camada Transversal de Qualidade e Integração Contínua (CI)"]
-        CI["✅ GitHub Actions (.github/workflows/ci.yml)<br/>Valida Push e Pull Requests automaticamente<br/>20 Testes (7 ETL Mock + 8 Vendedores + 5 Clientes) + Execução do Pipeline"]
+        CI["✅ GitHub Actions (.github/workflows/ci.yml)<br/>Valida Push e Pull Requests automaticamente (Python 3.11 + Node 22)<br/>37 Testes (7 ETL Mock + 24 Django API + 6 Frontend React) + Build"]
     end
 
     RAW --> EXT
@@ -75,14 +76,17 @@ flowchart TD
     AUTH --> API_ROTAS
     ORM --> ADMIN
     API_ROTAS --> OPENAPI
+    API_ROTAS --> FRONTEND
 
+    FRONTEND --> U_PUB
+    FRONTEND --> U_AUTH
     API_ROTAS --> U_PUB
     API_ROTAS --> U_AUTH
     OPENAPI --> U_PUB
     ADMIN --> U_ADM
 
     CI -. "Testa e valida ETL (7 testes + pipeline)" .-> C2
-    CI -. "Testa e valida API (13 testes DRF)" .-> C4
+    CI -. "Testa e valida API (24 testes DRF) e Frontend (6 testes Vitest)" .-> C4
 ```
 
 ---
@@ -128,8 +132,9 @@ sequenceDiagram
 | **2. Auditoria** | [`etl/audit.py`](../../etl/audit.py) | Registra as 188 transformações (`valor_original` ➔ `valor_tratado` ➔ `regra_aplicada`). |
 | **2. Orquestração e Carga** | [`etl/pipeline.py`](../../etl/pipeline.py) + [`etl/load.py`](../../etl/load.py) | Executa o fluxo completo e exporta SQLite, script PostgreSQL, CSVs e HTML. |
 | **3. Banco de Dados SQL** | [`banco_primora.sqlite3`](../../data/processed/banco_primora.sqlite3) + [`carga_postgresql.sql`](../../scripts/carga_postgresql.sql) | Armazena as tabelas `vendedor` (5), `cliente` (47) e `auditoria_etl` (188). |
-| **4. API REST Django** | [`api/vendedores/`](../../api/vendedores/) + [`api/clientes/`](../../api/clientes/) + [`api/config/`](../../api/config/) | Disponibiliza CRUD, filtros, Token Auth, Admin restrito e Redoc (`/api/docs/`). |
-| **5. Qualidade (CI)** | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) + [`tests/`](../../tests/) | Executa automaticamente os 20 testes (7 ETL + 8 Vendedores + 5 Clientes) em Push/PR. |
+| **4. API REST Django** | [`api/vendedores/`](../../api/vendedores/) + [`api/clientes/`](../../api/clientes/) + [`api/config/`](../../api/config/) | Disponibiliza CRUD, filtros, máscaras públicas, proteção de vínculos (`409`), Token Auth, Admin restrito e Redoc (`/api/docs/`). |
+| **4. Frontend Interativo** | [`frontend/src/`](../../frontend/src/) (`App.tsx` e `dashboard/Dashboard.tsx`) | Apresentação narrativa em `/` (com snapshot fallback) e Painel Operacional Híbrido em `/dashboard`. |
+| **5. Qualidade (CI)** | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) + [`tests/`](../../tests/) | Executa automaticamente os 37 testes (7 ETL + 24 Django API + 6 Frontend React) e o build em Push/PR. |
 
 ---
 
@@ -153,19 +158,20 @@ sequenceDiagram
 - **Entrada:** Tabelas em memória processadas pelo orquestrador `etl/pipeline.py`.
 - **Resultado:** 3 tabelas relacionais (`vendedor`, `cliente`, `auditoria_etl`) persistidas em banco SQLite (`banco_primora.sqlite3`), script SQL transacional para PostgreSQL (`scripts/carga_postgresql.sql`), planilhas CSV limpas e painel visual HTML (`visualizar_tabelas.html`).
 
-### Camada 4 — Aplicação e Consumo via API REST (`api/`)
-- **Função:** Disponibilizar consultas públicas, operações de manutenção autenticadas (CRUD), administração segura e documentação interativa.
+### Camada 4 — Aplicação e Consumo via API REST e Frontend (`api/` e `frontend/`)
+- **Função:** Disponibilizar consultas públicas com proteção de dados sensíveis, operações de manutenção autenticadas (CRUD), interface visual interativa (`/` e `/dashboard`), administração segura e documentação OpenAPI.
 - **Entrada:** Conexão direta às tabelas do ETL via Django ORM (`db_table`) e requisições HTTP dos usuários.
 - **Resultado:**
-  - Endpoints RESTful completos (`/api/clientes/`, `/api/vendedores/` e rotas de relacionamento por bairro e vendedor).
-  - Autenticação via Token (`/api/auth/token/`) e controle de acesso `IsAuthenticatedOrReadOnly`.
+  - Endpoints RESTful completos (`/api/clientes/`, `/api/vendedores/`, rotas de relacionamento por bairro e vendedor, `/api/health/` e `/api/apresentacao/metricas/`).
+  - Consultas públicas mascaram CNPJ, telefone e e-mail; contas autenticadas via Token (`/api/auth/token/` e `/api/auth/me/`) visualizam os dados completos e executam o CRUD, com proteção `HTTP 409` contra exclusões que romperiam vínculos com clientes ou com a auditoria.
+  - Experiência visual em React dividida entre a narrativa da apresentação (`/`) e o painel operacional (`/dashboard`).
   - Tabela `auditoria_etl` isolada exclusivamente no Django Admin (`/admin/`).
   - Documentação OpenAPI 3.0 gerada com `drf-spectacular` em `/api/docs/` (Redoc) e `/api/swagger/` (Swagger UI).
 
 ### Camada 5 — Qualidade e Integração Contínua / CI (`.github/workflows/ci.yml`)
-- **Função:** Impedir regressões e validar automaticamente tanto o pipeline de dados quanto a API REST a cada alteração enviada ao repositório.
+- **Função:** Impedir regressões e validar automaticamente o pipeline de dados, a API REST e o Frontend React a cada alteração enviada ao repositório.
 - **Entrada:** Eventos de `push` e `pull_request` monitorados pelo GitHub Actions.
-- **Resultado:** Execução automatizada de **20 testes** (**7 de ETL** com simulação *Mock* da API de CEP + **8 de Vendedores** + **5 de Clientes**) e validação da execução completa do pipeline ETL, compondo uma estrutura sólida de **Integração Contínua (CI)** pronta para evoluir a **CI/CD**.
+- **Resultado:** Execução automatizada de **37 testes** (**7 de ETL** com simulação *Mock* da API de CEP + **24 da API Django** cobrindo CRUD, filtros, máscaras, sessões e vínculos + **6 do Frontend React** com Vitest), além da execução do pipeline ETL e compilação de produção do frontend.
 
 ---
 
@@ -177,5 +183,6 @@ sequenceDiagram
 | **Guardrail de Conflito: CEP Validado Vence Texto Digitado** | Divergência entre o bairro digitado livremente pelo vendedor e o CEP real cadastrado (`CLI0002`, `CLI0017`, `CLI0033`). | O código postal validado pela consulta externa de referência geográfica é determinístico e auditável, superior ao texto livre sujeito a erro humano. | Elimina distorções nos relatórios regionais e mantém transparência total ao gravar a substituição em `auditoria_etl`. |
 | **CNPJ, Telefone e CEP como Texto (`VARCHAR` / `str`)** | Perda de zeros à esquerda (ex: CNPJ `04...` em `CLI0031`) ou à direita (ex: Telefone `...00` em `CLI0001`) quando tratados como tipos numéricos. | Identificadores cadastrais não sofrem operações aritméticas; tipos inteiros removem zeros significativos. | Preservação de 100% dos dígitos originais tanto no banco SQL quanto nas exportações CSV e JSON. |
 | **Reuso do Normalizador do ETL na Rota da API (`/api/clientes/bairro/{nome}/`)** | Usuários da API podem buscar bairros sem acentuação ou com grafias variadas na URL (ex: `aguas claras`, `guara ii`). | Acoplar a função `canonicalize_neighborhood_name` do ETL na `ClienteViewSet` unifica a regra de negócio entre engenharia de dados e backend. | Experiência de busca flexível e consistente, retornando os clientes corretos independentemente de acentos ou caixa. |
-| **Isolamento de `auditoria_etl` no Django Admin** | Necessidade de auditar transformações sem expor histórico bruto de correções na API pública. | Cumpre o requisito de governança do projeto registrando o model `AuditoriaEtl` apenas em `admin.py` com campos `readonly_fields`. | Segurança da informação e rastreabilidade administrativa completa em `/admin/`. |
-| **Integração Contínua (CI) no GitHub Actions** | Risco de que edições paralelas da equipe quebrem regras do ETL ou rotas da API antes do *merge*. | Um workflow automatizado executando os 20 testes e o pipeline a cada Push/PR garante qualidade contínua sem intervenção manual. | Confiabilidade comprovada por selo verde no repositório e base pronta para futura implantação contínua (CD). |
+| **Isolamento de `auditoria_etl` no Django Admin e Proteção de Vínculos (`HTTP 409`)** | Necessidade de auditar transformações sem expor histórico bruto na API pública e sem perder os 188 logs em edições operacionais. | Registra `AuditoriaEtl` apenas em `admin.py`, fixa o `id_cliente` e aplica `on_delete=PROTECT` nas chaves estrangeiras. | Segurança da informação no `/admin/` e preservação integral das 188 auditorias do ETL durante o uso do `/dashboard`. |
+| **Mascaramento Público de Contato e CNPJ (`ClienteSerializer`)** | Exposição de CNPJ completo, telefone e e-mail em consultas públicas não autenticadas. | Aplica máscara dinâmica em `to_representation` quando a requisição não possui usuário autenticado, liberando os dados completos apenas após autenticação por Token. | Privacidade por padrão nas rotas públicas de leitura (`GET`) e visibilidade completa no modo administrativo do `/dashboard`. |
+| **Integração Contínua (CI) no GitHub Actions** | Risco de que edições paralelas da equipe quebrem regras do ETL, rotas da API ou o build do React antes do *merge*. | Dois jobs automatizados (Python 3.11 e Node 22) executando os 37 testes, o pipeline ETL e o build do frontend a cada Push/PR. | Confiabilidade comprovada por selo verde no repositório e integração com o deploy declarado em `render.yaml`. |
