@@ -26,6 +26,11 @@ class ClienteSerializer(serializers.ModelSerializer):
         queryset=Vendedor.objects.all()
     )
 
+    def validate_id_cliente(self, value):
+        if self.instance is not None and value != self.instance.pk:
+            raise serializers.ValidationError('O ID do cliente não pode ser alterado.')
+        return value
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         request = self.context.get('request')

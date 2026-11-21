@@ -36,19 +36,19 @@ const customerFields = [
   { name: 'razao_social', label: 'Razão social', maxLength: 150 },
   { name: 'cnpj_normalizado', label: 'CNPJ', maxLength: 14, numeric: true },
   { name: 'telefone_normalizado', label: 'Telefone', maxLength: 11, numeric: true },
-  { name: 'email', label: 'E-mail', maxLength: 150, type: 'email' },
+  { name: 'email', label: 'E-mail', maxLength: 150, inputMode: 'email' },
   { name: 'bairro_normalizado', label: 'Bairro', maxLength: 100 },
   { name: 'cep_normalizado', label: 'CEP (opcional)', maxLength: 8, numeric: true, optional: true },
   { name: 'cidade', label: 'Cidade', maxLength: 50 },
   { name: 'uf', label: 'UF', maxLength: 2 },
   { name: 'data_cadastro_normalizado', label: 'Data de cadastro', type: 'date' },
 ] as const satisfies ReadonlyArray<{
-  name: keyof Customer; label: string; maxLength?: number; type?: string; numeric?: boolean; optional?: boolean
+  name: keyof Customer; label: string; maxLength?: number; type?: string; inputMode?: 'email'; numeric?: boolean; optional?: boolean
 }>
 
 type CustomerField = {
   name: typeof customerFields[number]['name']; label: string; maxLength?: number
-  type?: string; numeric?: boolean; optional?: boolean
+  type?: string; inputMode?: 'email'; numeric?: boolean; optional?: boolean
 }
 
 export function Editor({ target, sellers, close, save }: {
@@ -56,6 +56,7 @@ export function Editor({ target, sellers, close, save }: {
 }) {
   const [busy, setBusy] = useState(false)
   const [failure, setFailure] = useState<unknown>(null)
+  const sellerLabelId = useId()
   const fields = failure instanceof ApiError ? failure.fields : {}
   const customer = target.kind === 'customer' ? target.record : undefined
   const seller = target.kind === 'seller' ? target.record : undefined
@@ -113,14 +114,14 @@ export function Editor({ target, sellers, close, save }: {
           : <>
             {customerFields.map((field: CustomerField) => <label key={field.name}>{field.label}
               <input name={field.name} defaultValue={customer?.[field.name] ?? ''} type={field.type ?? 'text'}
-                inputMode={field.numeric ? 'numeric' : undefined} maxLength={field.maxLength}
+                inputMode={field.numeric ? 'numeric' : field.inputMode} maxLength={field.maxLength}
                 pattern={field.numeric ? '[0-9]+' : undefined}
                 readOnly={field.name === 'id_cliente' && Boolean(customer)}
                 required={!field.optional} {...validation(field.name)} />
               {fieldError(field.name)}
             </label>)}
-            <label className="vetor-span">Vendedor
-              <select name="vendedor_id" defaultValue={customer?.vendedor_id ?? ''} required {...validation('vendedor_id')}>
+            <label className="vetor-span"><span id={sellerLabelId}>Vendedor</span>
+              <select name="vendedor_id" aria-labelledby={sellerLabelId} defaultValue={customer?.vendedor_id ?? ''} required {...validation('vendedor_id')}>
                 <option value="">Selecione</option>
                 {sellers.map(item => <option key={item.id_vendedor} value={item.id_vendedor}>{item.nome_vendedor}</option>)}
               </select>

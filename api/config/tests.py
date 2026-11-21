@@ -86,6 +86,44 @@ class PresentationEndpointsTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'status': 'ok', 'database': 'available'})
 
+    def test_operational_changes_preserve_etl_history(self):
+        self.login_with_token()
+        history = list(AuditoriaEtl.objects.order_by('pk').values())
+        old_portfolio = f'/api/vendedores/{self.seller.pk}/clientes/'
+
+        rename = self.client.patch(f'/api/vendedores/{self.seller.pk}/',
+                                   {'nome_vendedor': 'Bruno Almeida Júnior'}, format='json')
+        self.assertEqual(rename.status_code, 200)
+        self.assertEqual(rename.data['nome_vendedor'], 'Bruno Almeida Júnior')
+        self.assertEqual(rename.data['id_vendedor'], self.seller.pk)
+        self.assertEqual(len(self.client.get(old_portfolio).data), 1)
+
+        replacement = self.client.post('/api/vendedores/', {'nome_vendedor': 'Nova Vendedora'}, format='json')
+        self.assertEqual(replacement.status_code, 201)
+        replacement_id = replacement.data['id_vendedor']
+        changes = {
+            'razao_social': 'Nova Razão Social',
+            'telefone_normalizado': '61900001234',
+            'cnpj_normalizado': '00123456000101',
+            'vendedor_id': replacement_id,
+        }
+        updated = self.client.patch('/api/clientes/CLI0002/', changes, format='json')
+        self.assertEqual(updated.status_code, 200)
+        self.assertEqual({field: updated.data[field] for field in changes}, changes)
+        self.assertEqual(self.client.get(old_portfolio).data, [])
+        self.assertEqual(self.client.get(f'/api/vendedores/{replacement_id}/clientes/').data[0]['id_cliente'], 'CLI0002')
+        self.assertEqual(self.client.delete(f'/api/vendedores/{self.seller.pk}/').status_code, 204)
+        self.assertEqual(self.client.delete('/api/clientes/CLI0002/').status_code, 409)
+        self.assertEqual(list(AuditoriaEtl.objects.order_by('pk').values()), history)
+
+    def test_audited_customer_id_cannot_change(self):
+        self.login_with_token()
+        response = self.client.patch('/api/clientes/CLI0002/', {'id_cliente': 'OUTRO'}, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('id_cliente', response.data)
+        self.assertFalse(Cliente.objects.filter(pk='OUTRO').exists())
+        self.assertTrue(AuditoriaEtl.objects.filter(cliente_id='CLI0002').exists())
+
     def test_bootstrap_command_is_discoverable(self):
         self.assertIn('bootstrap_primora', get_commands())
 
