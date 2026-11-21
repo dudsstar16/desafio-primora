@@ -1,7 +1,9 @@
 import csv
+import os
 from datetime import datetime
 from pathlib import Path
 
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.db import connection, transaction
@@ -10,23 +12,28 @@ from django.utils import timezone
 from clientes.models import AuditoriaEtl, Cliente
 from vendedores.models import Vendedor
 
+DEMO_ADMIN_USERS = ('duda', 'bruno', 'ana')
+
 
 class Command(BaseCommand):
-    help = 'Carrega os CSVs processados de forma idempotente no banco configurado.'
+    help = 'Carrega os CSVs processados e garante as contas administrativas do protótipo.'
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--if-empty',
             action='store_true',
-            help='Não altera o banco se qualquer tabela de negócio já tiver dados.',
+            help='Não altera as tabelas de negócio se já tiverem dados, mas garante os usuários do protótipo.',
         )
 
     @transaction.atomic
     def handle(self, *args, **options):
+        user_count = self._ensure_demo_admins()
         if options['if_empty'] and (
             Vendedor.objects.exists() or Cliente.objects.exists() or AuditoriaEtl.objects.exists()
         ):
-            self.stdout.write(self.style.WARNING('Carga ignorada: banco já possui dados.'))
+            self.stdout.write(self.style.WARNING(
+                f'Carga ignorada: banco já possui dados ({user_count} contas verificadas).'
+            ))
             return
 
         project_root = Path(__file__).resolve().parents[4]
@@ -45,9 +52,36 @@ class Command(BaseCommand):
         audit_count = self._load_audit(paths['audit'])
         self._reset_sequences()
         self.stdout.write(self.style.SUCCESS(
-            f'Carga concluída: {seller_count} vendedores, {client_count} clientes e '
-            f'{audit_count} auditorias.'
+            f'Carga concluída: {seller_count} vendedores, {client_count} clientes, '
+            f'{audit_count} auditorias e {user_count} contas administrativas.'
         ))
+
+    @staticmethod
+    def _ensure_demo_admins():
+        user_model = get_user_model()
+        password = os.getenv('DEMO_ADMIN_PASSWORD', '123456')
+        for username in DEMO_ADMIN_USERS:
+            user, created = user_model.objects.get_or_create(
+                username=username,
+                defaults={
+                    'email': f'{username}@primora.local',
+                    'is_staff': True,
+                    'is_superuser': True,
+                    'is_active': True,
+                },
+            )
+            updated = False
+            if not user.is_staff or not user.is_superuser or not user.is_active:
+                user.is_staff = True
+                user.is_superuser = True
+                user.is_active = True
+                updated = True
+            if created or not user.has_usable_password():
+                user.set_password(password)
+                updated = True
+            if updated:
+                user.save()
+        return len(DEMO_ADMIN_USERS)
 
     @staticmethod
     def _rows(path):

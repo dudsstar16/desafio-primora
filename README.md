@@ -51,7 +51,7 @@ Acesse `http://127.0.0.1:5173`. A publicação completa está declarada em `rend
 
 Abra `/dashboard` no frontend para consultar clientes, vendedores e a saúde da API. O botão **Painel** na apresentação abre essa interface.
 
-Visitantes consultam cadastros com CNPJ, telefone e e-mail mascarados pela API. Uma conta Django ativa libera os valores completos e a manutenção dos cadastros, conforme os requisitos do desafio. A equipe pode criar contas autorizadas pelo Django Admin ou pelo comando `createsuperuser` descrito abaixo.
+Visitantes consultam cadastros com CNPJ, telefone e e-mail mascarados pela API. Uma conta Django ativa libera os valores completos e a manutenção dos cadastros, conforme os requisitos do desafio. O comando `bootstrap_primora` garante automaticamente as três contas administrativas do protótipo (`duda`, `bruno` e `ana`, com senha padrão `123456` ou definida em `DEMO_ADMIN_PASSWORD`) para login no `/dashboard` e no `/admin/`.
 
 É possível editar razão social, contato, CNPJ e vendedor responsável de um cliente auditado. Para substituir um vendedor, cadastre o sucessor e transfira os clientes pelo campo **Vendedor** de cada cliente. O vendedor anterior pode ser excluído depois que sua carteira ficar vazia. A exclusão de cliente com auditorias retorna HTTP 409. O ID do cliente permanece fixo para preservar o vínculo com o histórico.
 

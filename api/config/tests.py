@@ -163,7 +163,17 @@ class PresentationEndpointsTests(APITestCase):
         self.assertTrue(AuditoriaEtl.objects.filter(cliente_id='CLI0002').exists())
 
     def test_bootstrap_command_is_discoverable(self):
+        from django.core.management import call_command
+
         self.assertIn('bootstrap_primora', get_commands())
+        call_command('bootstrap_primora', '--if-empty')
+        for username in ('duda', 'bruno', 'ana'):
+            with self.subTest(username=username):
+                resp = self.client.post('/api/auth/token/', {
+                    'username': username, 'password': '123456',
+                }, format='json')
+                self.assertEqual(resp.status_code, 200)
+                self.assertTrue(resp.data.get('token'))
 
     def test_metrics_are_aggregated_and_public(self):
         response = self.client.get('/api/apresentacao/metricas/')

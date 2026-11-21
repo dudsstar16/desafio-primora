@@ -12,7 +12,15 @@ load_dotenv(BASE_DIR / ".env")
 
 
 def env_bool(name, default=False):
-    return os.getenv(name, str(default)).strip().lower() in {'1', 'true', 'yes', 'on'}
+    val = os.getenv(name)
+    if val is None:
+        return default
+    norm = val.strip().lower()
+    if norm in {'1', 'true', 'yes', 'on'}:
+        return True
+    if norm in {'0', 'false', 'no', 'off'}:
+        return False
+    return default
 
 
 def env_list(name, default=''):
